@@ -6,4 +6,4 @@ echo "delay"
 sleep 5
 echo starting 
 
-/root/DigitPanelDemo/leds F000f00
+/root/DigitPanelDemo/leds P000f00
