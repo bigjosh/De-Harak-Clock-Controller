@@ -1,0 +1,10 @@
+[Unit]
+Description=Run LEDs background sender
+
+[Service]
+WorkingDirectory=/www/digit57.com/cgi-bin/
+ExecStart=/bin/bash /www/digit57.com/cgi-bin/ledsd.sh
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
