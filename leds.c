@@ -6,6 +6,10 @@
 #include <sys/timerfd.h>
 #include <ctype.h>
 
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
@@ -50,7 +54,7 @@ void sendOPCPixels() {
             
     for( int pin = 0; pin <PIN_COUNT ; pin++ ) {
         
-        for( int row=0; row < rows_per_pin ; row++ ) {
+        for( int row=0; row < ROWS_PER_PIN ; row++ ) {
                        
             int y= ( PIN_COUNT-pin-1 ) + ( row * rows_per_pin );
                                    
