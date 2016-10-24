@@ -14,35 +14,46 @@
 #define SIZE_X 59
 #define SIZE_Y 26
 
-#define PINS_COUNT
+#define PINS_COUNT 6
+
 
 unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
 unsigned char g[SIZE_X][SIZE_Y];     // Buffer of RGB values
 unsigned char b[SIZE_X][SIZE_Y];     // Buffer of RGB values
 
+#define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
+
+#define OPC_BYTECOUNT (SIZE_X*(PIN_COUNT*ROWS_PER_PIN)*3)
+
+
+#define OPC_HEADERSIZE 4 		// 4 bytes in opc header
+#define OPC_BUFFERSIZE (OPC_HEADERSIZE + OPC_BYTECOUNT)
+
+unsigned char opcbuffer[ OPC_BUFFERSIZE ];   //Convert the buffer to a single char for each R,G, & B 
+
+void initopcheader() {
+		
+	opcbuffer[0]=0x00;		// Channel=0 
+	opcbuffer[1]=0x00;		// Command=0	
+	opcbuffer[2]=(OPC_BYTECOUNT>>8);		// len MSB
+	opcbuffer[3]=(OPC_BYTECOUNT&0xff);	// len LSB
+	
+}
+
+int sockfd;
 
 void sendOPCPixels() {
-    
-    printf( "%c%c" , 0x00, 0x00 );		// Channel=0 , Command=0
-
-    // The data blocks for all pins much be the same length, so we have to pad ones that go off the top of the display with 00
-
-    unsigned rows_per_pin = ((SIZE_Y-1) / PIN_COUNT)+1; 	// Round up to lowest rowcount that can hold all our actual rows. 
-
-    int len = SIZE_X*(PIN_COUNT*rows_per_pin)*3;	// Full buffer with padded rows (3 bytes per pixel)
-    
-    printf("%c%c" , (len>>8) , len & 0xff );  // High byte/low byte of data length
-        
+	
+	initopcheader();			// TODO: Only do this once per run
+	
+    unsigned char *m = opcbuffer+OPC_HEADERSIZE;	
+            
     for( int pin = 0; pin <PIN_COUNT ; pin++ ) {
         
         for( int row=0; row < rows_per_pin ; row++ ) {
-            
-            static unsigned char rowBuffer[ SIZE_X * 3];   //Make sending more efficient
-            unsigned char *m = rowBuffer;
-            
+                       
             int y= ( PIN_COUNT-pin-1 ) + ( row * rows_per_pin );
-            
-                        
+                                   
             if (y>=SIZE_Y) {      // Of the screen?
                 
                 
@@ -54,8 +65,7 @@ void sendOPCPixels() {
                 }
                 
             } else {                
-            
-            
+                        
                 if (row&1) {  // Alternating rows go back and forth
                                         
                     int x=SIZE_X;
@@ -80,9 +90,11 @@ void sendOPCPixels() {
                }                
             }
             
-            fwrite( rowBuffer , SIZE_X * 3 , 1 , stdout);
+			
         }
     }
+	
+    int x=write( sockfd , opcbuffer ,  OPC_BUFFERSIZE );		// 3 bytes (r,g,b) per pixel	
     
 }
 
@@ -541,6 +553,27 @@ void half( const char *colorString ) {
     
 }
 
+
+int opensocket() {
+	
+	int n;
+   
+    struct sockaddr_in servaddr;
+ 
+    sockfd=socket(AF_INET,SOCK_STREAM,0);
+    bzero(&servaddr,sizeof servaddr);
+ 
+    servaddr.sin_family=AF_INET;
+    servaddr.sin_port=htons(7890);
+ 
+    inet_pton(AF_INET,"127.0.0.1",&(servaddr.sin_addr));
+ 
+    connect(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+    
+    return(sockfd);
+    
+}
+
 int main( int argc, char **argv) {
     
     if (argc!=2) {
@@ -555,6 +588,12 @@ int main( int argc, char **argv) {
             
             return(1);        
     }
+	
+    opensocket();
+    
+	if (sockfd < 0) {
+		fprintf( stderr , "ERROR opening socket");    
+	}	
     
     switch (argv[1][0]) {
         
