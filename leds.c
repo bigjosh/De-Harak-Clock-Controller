@@ -14,7 +14,7 @@
 #define SIZE_X 59
 #define SIZE_Y 26
 
-#define PINS_COUNT 6
+#define PIN_COUNT 6
 
 
 unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
