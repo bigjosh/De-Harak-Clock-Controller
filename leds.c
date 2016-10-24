@@ -56,7 +56,7 @@ void sendOPCPixels() {
         
         for( int row=0; row < ROWS_PER_PIN ; row++ ) {
                        
-            int y= ( PIN_COUNT-pin-1 ) + ( row * rows_per_pin );
+            int y= ( PIN_COUNT-pin-1 ) + ( row * ROWS_PER_PIN );
                                    
             if (y>=SIZE_Y) {      // Of the screen?
                 
