@@ -220,6 +220,10 @@ void bullseyes( const char *colorString ){
     float radius = sqrt( (xmid*xmid) + (ymid*ymid));
     
     unsigned int loop=0;
+
+    struct periodic_info pi;
+    
+    make_periodic( 50000 , &pi );
     
     while (1) {
                 
@@ -255,13 +259,22 @@ void bullseyes( const char *colorString ){
                 
             }
         }
+
         
+        wait_period(&pi);
+            
         sendOPCPixels();
-        usleep(20000);
+
+	loop++;
+    
+        if (pi.wakeups_missed) {
         
-        loop++;
+            fprintf(stderr,"Missed:%lu\r\n", (unsigned long) pi.wakeups_missed );
         
-    }        
+    	}
+         
+    }   
+    end_periodic(&pi);
     
 }
 
