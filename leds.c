@@ -56,7 +56,7 @@ void sendOPCPixels() {
         
         for( int row=0; row < ROWS_PER_PIN ; row++ ) {
                        
-            int y= ( PIN_COUNT-pin-1 ) + ( row * ROWS_PER_PIN );
+            int y= ( pin ) + ( row * ROWS_PER_PIN );
                                    
             if (y>=SIZE_Y) {      // Of the screen?
                 
@@ -226,11 +226,12 @@ void bullseyes( const char *colorString ){
         for( int x=0; x<SIZE_X; x++) {
             
             float xd = xmid - x;
+
             float xsq = xd * xd;
                         
             for(int y=0;y<SIZE_Y;y++) {
                 
-                float yd = ymid - y;
+                float yd = ymid - ((y*23)/16);		// Correct pitch aspect ratio
                 
                 float ysq = yd * yd;
                 
@@ -256,7 +257,7 @@ void bullseyes( const char *colorString ){
         }
         
         sendOPCPixels();
-        usleep(10000);
+        usleep(20000);
         
         loop++;
         
