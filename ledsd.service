@@ -2,9 +2,12 @@
 Description=Run LEDs background sender
 
 [Service]
-WorkingDirectory=/www/digit57.com/cgi-bin/
-ExecStart=/bin/bash /www/digit57.com/cgi-bin/ledsd.sh
+WorkingDirectory=
+ExecStart=/root/DigitPanelDemo/leds C000f00
 KillMode=process
+
+After=LEDscape.service
 
 [Install]
 WantedBy=multi-user.target
+

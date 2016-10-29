@@ -15,11 +15,14 @@
 #include <netdb.h> 
 #include <arpa/inet.h>
 
+#define PI (3.141592653589793)
+
 #define SIZE_X 59
 #define SIZE_Y 26
 
-#define PIN_COUNT 6
+#define ASPECT_RATIO (16.0/23.0)        // Width/heigh (these are the imperical measurements in mm)
 
+#define PIN_COUNT 6
 
 unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
 unsigned char g[SIZE_X][SIZE_Y];     // Buffer of RGB values
@@ -27,7 +30,7 @@ unsigned char b[SIZE_X][SIZE_Y];     // Buffer of RGB values
 
 #define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
 
-#define OPC_BYTECOUNT (SIZE_X*(PIN_COUNT*ROWS_PER_PIN)*3)
+#define OPC_BYTECOUNT (SIZE_X*(PIN_COUNT*ROWS_PER_PIN)*3)       // 3 bytes per pixel for RGB
 
 
 #define OPC_HEADERSIZE 4 		// 4 bytes in opc header
@@ -49,22 +52,25 @@ int sockfd;
 void sendOPCPixels() {
 	
 	initopcheader();			// TODO: Only do this once per run
+
+    // printf("start... pins=%d, rowsperpin=%d\r\n", PIN_COUNT , ROWS_PER_PIN);
 	
     unsigned char *m = opcbuffer+OPC_HEADERSIZE;	
             
-    for( int pin = 0; pin <PIN_COUNT ; pin++ ) {
+    for( int pin = 0; pin <PIN_COUNT ; pin++ ) {                // OPC packet has each string snet sequentially
         
         for( int row=0; row < ROWS_PER_PIN ; row++ ) {
                        
-            int y= ( pin ) + ( row * ROWS_PER_PIN );
+            int y= ( pin ) + ( row * PIN_COUNT );
+
+           // printf("p,r,y=%d,%d,%d\r\n",pin,row,y);
                                    
             if (y>=SIZE_Y) {      // Of the screen?
-                
-                
+                                
                 for( int i=0;i<SIZE_X * 3;i++) {
                     
                     *(m++) = 0x00;                                        
-                    // Send zeros as filler
+                    // Send zeros as padding
                     
                 }
                 
@@ -206,7 +212,9 @@ unsigned char parsehexdigits( const char *s ) {
     
 }
 
-
+#define BE_FRAMERATE    30          // Number of frames per second
+#define BE_STEPS        100        // Steps per animation cycle
+#define BE_RINGS        3           // Number of bullseye rings
 
 void bullseyes( const char *colorString ){
     
@@ -219,72 +227,63 @@ void bullseyes( const char *colorString ){
     
     float radius = sqrt( (xmid*xmid) + (ymid*ymid));
     
-    unsigned int loop=0;
-
     struct periodic_info pi;
     
-    make_periodic( 50000 , &pi );
+    make_periodic( 1000000UL / BE_FRAMERATE , &pi );           // Animation Speed
     
     while (1) {
-                
-        for( int x=0; x<SIZE_X; x++) {
-            
-            float xd = xmid - x;
 
-            float xsq = xd * xd;
-                        
-            for(int y=0;y<SIZE_Y;y++) {
+        for( float step = 0; step < 2.0 * PI ; step += ( 2.0*PI / BE_STEPS )) {     // One full animation cycle
                 
-                float yd = ymid - ((y*23)/16);		// Correct pitch aspect ratio
+            for( int x=0; x<SIZE_X; x++) {
                 
-                float ysq = yd * yd;
-                
-                float distance = sqrt( ysq + xsq )/radius;
-                
-                // distance is 0-1
-                                
-                int color = (int) (
-                
-                    0.5+ ( ( 100.0 + (100.0 * ( 
-                
-                        sin(  ( (distance + (loop/100.0)) * 3.1415 * 5)  )
+                float xd = (xmid - x ) * ASPECT_RATIO;		// Correct pitch aspect ratiox;
+
+                float xsq = xd * xd;
+                            
+                for(int y=0;y<SIZE_Y;y++) {
                     
-                    ) ) ) ) );
-                
-                
-                r[x][y]= (color*r1)/255;
-                g[x][y]= (color*g1)/255;
-                b[x][y]= (color*b1)/255;
-                //SETRGB( x , y , color , color , color );
-                
+                    float yd = ymid - y; 
+                    
+                    float ysq = yd * yd;
+                    
+                    float distance = sqrt( ysq + xsq )/radius;
+                    
+                    // distance is normalized 0-1
+                                    
+                    float color =
+
+                            (
+                                sin(  (distance * 2 * PI * BE_RINGS) + step )  
+                            
+                             + 1 ) /2;      // normalized to 0-1
+                    
+                    //printf("x,y,d,c=%d,%d,%f,%f\r\n",x,y,distance,color);
+
+                    r[x][y]= (color*r1);
+                    g[x][y]= (color*g1);
+                    b[x][y]= (color*b1);
+                    
+                }   
             }
-        }
 
-        
-        wait_period(&pi);
-
-        if (loop<500) {
             
-            loop++;
-    } else {
-
-        memset( r , sizeof(r) , 0x00 );
-        memset( g, sizeof(r) , 0x00 );
-        memset( b , sizeof(r) , 0x00 );
-        
-    }
+            wait_period(&pi);
 
             sendOPCPixels();
 
-        if (pi.wakeups_missed) {
-        
-            fprintf(stderr,"Missed:%lu\r\n", (unsigned long) pi.wakeups_missed );
-        
-    	}
-         
-    }   
-    end_periodic(&pi);
-    
+            if (pi.wakeups_missed) {
+            
+                fprintf(stderr,"Missed:%lu\r\n", (unsigned long) pi.wakeups_missed );
+            
+            }
+            
+        }      
+
+    }
+
+   end_periodic(&pi);
+
 }
 
 
@@ -576,18 +575,52 @@ void corners( const char *colorString ) {
         unsigned int y;
     } point_t;
 
-    point_t points[] = { {0,0} , {1,1} };
+    point_t points[] = { 
+        {0,SIZE_Y-1} , 
+        {SIZE_X-1, SIZE_Y-1},
+        {0,0} , 
+        {SIZE_X-1,0} ,          
+    };
 
-    for(int i=0; i< sizeof( points) / sizeof( points[0]) ; i++ ) {
-            unsigned int x=points[i];
-            unsigned int y=points[i];
 
-            r[x][x] = r1;
-            g[x][y] = g1;
-            b[x][y] = b1;        
+    
+    struct periodic_info pi;
+    
+    make_periodic( 50000 , &pi );
+
+    unsigned char flip=0;
+    
+    while(1) {
+
+        for(int i=0; i<  sizeof( points) / sizeof( points[0]) ; i++ ) {
+
+                unsigned int x=points[i].x;
+                unsigned int y=points[i].y;
+
+                if (flip) {
+
+                    r[x][y] = 0;
+                    g[x][y] = 0;
+                    b[x][y] = 0;
+
+
+                } else {
+
+                    r[x][y] = r1;
+                    g[x][y] = g1;
+                    b[x][y] = b1;        
+
+                }        
+        }
+
+        flip=!flip;
+        
+
+        sendOPCPixels();
+        wait_period(&pi);
+        
     }
 
-    sendOPCPixels();    
     
 }
 
@@ -647,6 +680,7 @@ int main( int argc, char **argv) {
             fprintf(stderr,"         B=BullsEye\r\n");
             fprintf(stderr,"         F=fullscreen, arg=RGB color (FFFFFF=white)\r\n");
             fprintf(stderr,"         H=halfscreen, arg=RGB color (FF0000=red)\r\n");
+            fprintf(stderr,"         C=corners, arg=RGB color (FF0000=red)\r\n");
             
             fprintf(stderr,"Example: leds F00000F = Full panel to blue\r\n");
             
@@ -667,6 +701,8 @@ int main( int argc, char **argv) {
         case 'P': plasma();                 break;
         case 'F': full( argv[1]+1 );          break;
         case 'H': half( argv[1]+1 );          break;
+        case 'C': corners( argv[1]+1 );          break;
+        
         
         default: 
             fprintf(stderr,"Try running with no args for help.\r\n");        
