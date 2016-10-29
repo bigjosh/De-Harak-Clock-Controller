@@ -550,7 +550,17 @@ void full( const char *colorString ) {
         }
     }    
     
-    sendOPCPixels();    
+    struct periodic_info pi;
+    
+    make_periodic( 5000 , &pi );
+    
+    while(1) {
+    
+
+        sendOPCPixels();
+        wait_period(&pi);
+    }
+
     
 }
 
@@ -564,24 +574,18 @@ void corners( const char *colorString ) {
     typedef struct {
         unsigned int x;
         unsigned int y;
-    } point;
+    } point_t;
 
-    point[] = { {0,0} , {1,1} };
-    
-    for( int x=0; x<SIZE_X; x++) {
-            
-        for(int y=0;y<SIZE_Y;y++) {
-                
-            r[0][0] = r1;
+    point_t points[] = { {0,0} , {1,1} };
+
+    for(int i=0; i< sizeof( points) / sizeof( points[0]) ; i++ ) {
+            unsigned int x=points[i];
+            unsigned int y=points[i];
+
+            r[x][x] = r1;
             g[x][y] = g1;
-            b[x][y] = b1;
-                            
-                
-        }
+            b[x][y] = b1;        
     }
-
-
-
 
     sendOPCPixels();    
     
