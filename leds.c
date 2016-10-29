@@ -202,7 +202,7 @@ unsigned char parsehexdigit( const char s) {
 
 unsigned char parsehexdigits( const char *s ) {
     
-    return( ( parsehexdigit(*s) << 4 ) + parsehexdigit( *(s+1)) );
+    return( ( parsehexdigit(*s) *16  ) + parsehexdigit( *(s+1)) );
     
 }
 
@@ -262,11 +262,20 @@ void bullseyes( const char *colorString ){
 
         
         wait_period(&pi);
-            
-        sendOPCPixels();
 
-	loop++;
-    
+        if (loop<500) {
+            
+            loop++;
+    } else {
+
+        memset( r , sizeof(r) , 0x00 );
+        memset( g, sizeof(r) , 0x00 );
+        memset( b , sizeof(r) , 0x00 );
+        
+    }
+
+            sendOPCPixels();
+
         if (pi.wakeups_missed) {
         
             fprintf(stderr,"Missed:%lu\r\n", (unsigned long) pi.wakeups_missed );
@@ -546,6 +555,39 @@ void full( const char *colorString ) {
 }
 
 
+void corners( const char *colorString ) {
+    
+    unsigned char r1 = parsehexdigits(colorString);
+    unsigned char g1 = parsehexdigits(colorString+2);
+    unsigned char b1 = parsehexdigits(colorString+4);
+        
+    typedef struct {
+        unsigned int x;
+        unsigned int y;
+    } point;
+
+    point[] = { {0,0} , {1,1} };
+    
+    for( int x=0; x<SIZE_X; x++) {
+            
+        for(int y=0;y<SIZE_Y;y++) {
+                
+            r[0][0] = r1;
+            g[x][y] = g1;
+            b[x][y] = b1;
+                            
+                
+        }
+    }
+
+
+
+
+    sendOPCPixels();    
+    
+}
+
+
 
 void half( const char *colorString ) {
     
@@ -615,8 +657,8 @@ int main( int argc, char **argv) {
     
     switch (argv[1][0]) {
         
-        case 'S': stars(argv[1]+1);           break;
-        case 'R': rockrose();        break;
+        case 'S': stars(argv[1]+1);         break;
+        case 'R': rockrose();               break;
         case 'B': bullseyes(argv[1]+1);     break;
         case 'P': plasma();                 break;
         case 'F': full( argv[1]+1 );          break;
