@@ -672,6 +672,8 @@ int opensocket() {
 }
 
 int main( int argc, char **argv) {
+	
+	printf("LEDs (c)2016 josh levine [josh.com]\r\n");
     
     if (argc!=2) {
             fprintf(stderr,"Usage  : leds command arg (no space between command and arg)\r\n");
@@ -691,8 +693,10 @@ int main( int argc, char **argv) {
     
 	if (sockfd < 0) {
 		fprintf( stderr , "ERROR opening socket");    
+		return(1);
 	}	
     
+	printf("Socket established.\r\n");
     switch (argv[1][0]) {
         
         case 'S': stars(argv[1]+1);         break;

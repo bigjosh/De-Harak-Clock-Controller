@@ -1,12 +1,12 @@
 [Unit]
 Description=Run LEDs background sender
+After=ledscape.service
 
 [Service]
 WorkingDirectory=
-ExecStart=/root/DigitPanelDemo/leds C000f00
+ExecStart=/root/DigitPanelDemo/startledsd.sh
 KillMode=process
 
-After=LEDscape.service
 
 [Install]
 WantedBy=multi-user.target
