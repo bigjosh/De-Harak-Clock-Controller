@@ -212,15 +212,21 @@ unsigned char parsehexdigits( const char *s ) {
     
 }
 
+
+
 #define BE_FRAMERATE    30          // Number of frames per second
 #define BE_STEPS        100        // Steps per animation cycle
 #define BE_RINGS        3           // Number of bullseye rings
+
+#define COLOR_STEPS 100 			// USed for color cycle mode
 
 void bullseyes( const char *colorString ){
     
     unsigned char r1 = parsehexdigits(colorString);
     unsigned char g1 = parsehexdigits(colorString+2);
     unsigned char b1 = parsehexdigits(colorString+4);    
+    
+    unsigned int colorstep = 0;		// For rainbow display
               
     float xmid = SIZE_X/2.0;
     float ymid = SIZE_Y/2.0;
@@ -232,6 +238,68 @@ void bullseyes( const char *colorString ){
     make_periodic( 1000000UL / BE_FRAMERATE , &pi );           // Animation Speed
     
     while (1) {
+	    
+	    if ( ! *colorString ) { 	// No color specified, so run a rainbow
+	     
+		  colorstep++;
+		  
+		  if (colorstep>=COLOR_STEPS) {
+			  colorstep=0;
+		  }
+
+		// HSV to RGB
+		  
+		double      hh, p, q, t, ff;
+		long        i;
+
+		    hh =  (colorstep * 360.0 ) / COLOR_STEPS ;
+		    
+		    hh /= 60.0;
+		    
+		    i = (long)hh;
+		    
+		    ff = hh - i;
+		    p = 1.0 * (1.0 - 1.0);
+		    q = 1.0 * (1.0 - (1.0 * ff));
+		    t = 1.0 * (1.0 - (1.0 * (1.0 - ff)));
+
+		    switch(i) {
+		    case 0:
+			   r1 = 255;
+			   g1 = t * 255;
+			   b1 = p * 255;
+			   break;
+		    case 1:
+			   r1 = q * 255;
+			   g1 = 255;
+			   b1 = p * 255;
+			   break;
+		    case 2:
+			   r1 = p  * 255;
+			   g1 = 255;
+			   b1 = t * 255;
+			   break;
+
+		    case 3:
+			   r1 = p * 255;
+			   g1 = q * 255;
+			   b1 = 255;
+			   break;
+		    case 4:
+			   r1 = t * 255;
+			   g1 = p *255;
+			   b1 = 255;
+			   break;
+		    case 5:
+		    default:
+			   r1 = 255;
+			   g1 = p * 255;
+			   b1 = q *255;
+			   break;
+		    }		  
+				  		  		  
+		}
+	  	    
 
         for( float step = 0; step < 2.0 * PI ; step += ( 2.0*PI / BE_STEPS )) {     // One full animation cycle
                 
@@ -259,13 +327,16 @@ void bullseyes( const char *colorString ){
                              + 1 ) /2;      // normalized to 0-1
                     
                     //printf("x,y,d,c=%d,%d,%f,%f\r\n",x,y,distance,color);
+				
 
-                    r[x][y]= (color*r1);
-                    g[x][y]= (color*g1);
-                    b[x][y]= (color*b1);
-                    
+				r[x][y]= (color*r1);
+				g[x][y]= (color*g1);
+				b[x][y]= (color*b1);
+									
+				
                 }   
             }
+		  
 
             
             wait_period(&pi);
@@ -273,8 +344,9 @@ void bullseyes( const char *colorString ){
             sendOPCPixels();
 
             if (pi.wakeups_missed) {
-            
+		
                 fprintf(stderr,"Missed:%lu\r\n", (unsigned long) pi.wakeups_missed );
+			 pi.wakeups_missed=0;
             
             }
             
@@ -501,6 +573,7 @@ void rockrose() {
         if (pi.wakeups_missed) {
         
             fprintf(stderr,"Missed:%lu\r\n", (unsigned long) pi.wakeups_missed );
+		 pi.wakeups_missed=0;
         
         }
     }
@@ -679,7 +752,7 @@ int main( int argc, char **argv) {
             fprintf(stderr,"Usage  : leds command arg (no space between command and arg)\r\n");
             fprintf(stderr,"Command: S=Stars\r\n");
             fprintf(stderr,"         R=Rockrose\r\n");
-            fprintf(stderr,"         B=BullsEye\r\n");
+            fprintf(stderr,"         B=BullsEye arg=RGB color or no arg for rainbow\r\n");
             fprintf(stderr,"         F=fullscreen, arg=RGB color (FFFFFF=white)\r\n");
             fprintf(stderr,"         H=halfscreen, arg=RGB color (FF0000=red)\r\n");
             fprintf(stderr,"         C=corners, arg=RGB color (FF0000=red)\r\n");

@@ -6,4 +6,6 @@ echo "delay"
 sleep 5
 echo starting 
 
-/root/DigitPanelDemo/leds P000f00
+echo starting with rainbow bullseye
+/root/DigitPanelDemo/leds B
+
