@@ -20,6 +20,8 @@
 #define SIZE_X 59
 #define SIZE_Y 26
 
+#define PIN_COUNT 6
+
 #define ASPECT_RATIO (16.0/23.0)        // Width/heigh (these are the imperical measurements in mm)
 
 unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
@@ -54,13 +56,12 @@ int sockfd, i, slen=sizeof(serv_addr);
 
 void opensocket(const char *deststr) {
 		
-	sockfd= socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))==-1)
-        err("socket");
- 
+	sockfd= socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
 	bzero(&serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(PORT);
-	if (inet_aton(argv[1], &serv_addr.sin_addr)==0)
+	serv_addr.sin_port = htons(OPCPORT);
+	if (inet_aton( deststr , &serv_addr.sin_addr)==0)
 	{
         fprintf(stderr, "inet_aton() failed\n");
         exit(1);
@@ -147,12 +148,13 @@ unsigned char parsehexdigits( const char *s ) {
     
 }
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
 
 int main( int argc, char **argv) {
 	
 	printf("LEDs (c)2016 josh levine [josh.com]\r\n");
     
-    if (argc!=2) {
+    if (argc!=7) {
             fprintf(stderr,"Usage  : leds dest_ip  rgb left right top bot \r\n");
             fprintf(stderr,"         RGB color format XXXXXX (FFFFFF=white)\r\n");
             
@@ -161,7 +163,9 @@ int main( int argc, char **argv) {
             return(1);        
     }
 	
-    opensocket( arg[1] );
+	printf("dest ip : %s\r\n", argv[1]);
+	
+    opensocket( argv[1] );
     
 	if (sockfd < 0) {
 		fprintf( stderr , "ERROR opening socket");    
@@ -176,16 +180,18 @@ int main( int argc, char **argv) {
     unsigned char g1 = parsehexdigits(colorString+2);
     unsigned char b1 = parsehexdigits(colorString+4);	
     
+    printf( "Color={%X,%X,%X}\r\n" , r1, g1, b1);
+    
 	unsigned char left 		= atoi( argv[3] );	
 	unsigned char right 	= atoi( argv[4] );	
 	unsigned char top 		= atoi( argv[5] );	
 	unsigned char bottom 	= atoi( argv[6] );	
         
-    
+    printf("l=%d r=%d t=%d b=%d\r\n",left,right,top,bottom);
 		
-   for( int x=left; x< min(SIZE_X , right)  ; x++) {
+   for( int x=left; x< MIN(SIZE_X , right)  ; x++) {
         
-        for(int y=top;y<= min(SIZE_Y, top) ;y++) {
+        for(int y=top;y<= MIN(SIZE_Y, top) ;y++) {
             
             r[x][y] = r1;
             g[x][y] = g1;
