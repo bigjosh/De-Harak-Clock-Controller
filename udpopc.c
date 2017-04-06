@@ -45,6 +45,8 @@ void initopcheader() {
 	
 }
 
+
+
 #define OPCPORT 7890
 
 struct sockaddr_in serv_addr;
@@ -130,127 +132,20 @@ void sendOPCPixels() {
 
 #define SETRGB( x, y , red , green, blue ) {r[x][y]=red;g[x][y]=green;b[x][y]=blue;}
     
-
-
-void full( const char *colorString ) {
+unsigned char parsehexdigit( const char s) {
     
-    unsigned char r1 = parsehexdigits(colorString);
-    unsigned char g1 = parsehexdigits(colorString+2);
-    unsigned char b1 = parsehexdigits(colorString+4);
-        
-    for( int x=0; x<SIZE_X; x++) {
-            
-        for(int y=0;y<SIZE_Y;y++) {
-                
-            r[x][y] = r1;
-            g[x][y] = g1;
-            b[x][y] = b1;
-                            
-                
-        }
-    }    
-    
-    struct periodic_info pi;
-    
-    make_periodic( 5000 , &pi );
-    
-    while(1) {
-    
-
-        sendOPCPixels();
-        wait_period(&pi);
-    }
-
-    
+    if (isdigit(s)) return( s - '0' );
+    if (islower(s) && s<='f') return( s - 'a' + 10);
+    if (isupper(s) && s<='F') return( s - 'A' + 10);
+    return(0);
 }
 
 
-void corners( const char *colorString ) {
+unsigned char parsehexdigits( const char *s ) {
     
-    unsigned char r1 = parsehexdigits(colorString);
-    unsigned char g1 = parsehexdigits(colorString+2);
-    unsigned char b1 = parsehexdigits(colorString+4);
-        
-    typedef struct {
-        unsigned int x;
-        unsigned int y;
-    } point_t;
-
-    point_t points[] = { 
-        {0,SIZE_Y-1} , 
-        {SIZE_X-1, SIZE_Y-1},
-        {0,0} , 
-        {SIZE_X-1,0} ,          
-    };
-
-
-    
-    struct periodic_info pi;
-    
-    make_periodic( 50000 , &pi );
-
-    unsigned char flip=0;
-    
-    while(1) {
-
-        for(int i=0; i<  sizeof( points) / sizeof( points[0]) ; i++ ) {
-
-                unsigned int x=points[i].x;
-                unsigned int y=points[i].y;
-
-                if (flip) {
-
-                    r[x][y] = 0;
-                    g[x][y] = 0;
-                    b[x][y] = 0;
-
-
-                } else {
-
-                    r[x][y] = r1;
-                    g[x][y] = g1;
-                    b[x][y] = b1;        
-
-                }        
-        }
-
-        flip=!flip;
-        
-
-        sendOPCPixels();
-        wait_period(&pi);
-        
-    }
-
+    return( ( parsehexdigit(*s) *16  ) + parsehexdigit( *(s+1)) );
     
 }
-
-
-
-void half( const char *colorString ) {
-    
-    unsigned char r1 = parsehexdigits(colorString);
-    unsigned char g1 = parsehexdigits(colorString+2);
-    unsigned char b1 = parsehexdigits(colorString+4);
-    
-    unsigned int marginx = (SIZE_X /4)+5 ;
-        
-    for( int x=marginx; x< (SIZE_X-marginx) ; x++) {
-        
-        for(int y=0;y<SIZE_Y;y++) {
-            
-            r[x][y] = r1;
-            g[x][y] = g1;
-            b[x][y] = b1;
-            
-            
-        }
-    }
-    
-    sendOPCPixels();
-    
-}
-
 
 
 int main( int argc, char **argv) {
