@@ -58,6 +58,10 @@ void opensocket(const char *deststr) {
 		
 	sockfd= socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
+	int broadcastEnable=1;
+	int ret=setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
+
+
 	bzero(&serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(OPCPORT);
@@ -202,6 +206,8 @@ int main( int argc, char **argv) {
     }
     
     sendOPCPixels();
+
+	printf("Sent.\r\n");
         
     return(0);
     
