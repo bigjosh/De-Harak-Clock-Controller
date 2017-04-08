@@ -10,7 +10,15 @@ while IFS=' ' read -r when mac ip hostname; do
   # if the line has less than three fields, the missing fields will be set to to an empty string
   # if the line has more than three fields, `field3` will get the all the values, including the third field, including the delimiter(s)
 
-  sshpass -p temppwd ssh "debian@$ip" -oStrictHostKeyChecking=no "sudo killall leds"
+  echo "Calling $ip..."
+  #sshpass -p temppwd ssh "debian@$ip" ssh -o StrictHostKeyChecking=no root "sudo killall leds"
+  #ssh o StrictHostKeyChecking=no root "root@$ip" "sudo killall leds"
+ 
+  # need -n or else breaks loop. Ahhhh!  http://stackoverflow.com/a/1396070/3152071
+  ssh -n -o StrictHostKeyChecking=no "root@$ip" "sudo killall leds"
 
+  echo "returned $?"
+	
   # echo "$when" "$ip"
+
 done < seen.lnk

@@ -195,7 +195,7 @@ int main( int argc, char **argv) {
 		
    for( int x=left; x< MIN(SIZE_X , right)  ; x++) {
         
-        for(int y=top;y<= MIN(SIZE_Y, top) ;y++) {
+        for(int y=top;y<= MIN(SIZE_Y, bottom) ;y++) {
             
             r[x][y] = r1;
             g[x][y] = g1;
