@@ -15,9 +15,25 @@ while IFS=' ' read -r when mac ip hostname; do
   #ssh o StrictHostKeyChecking=no root "root@$ip" "sudo killall leds"
  
   # need -n or else breaks loop. Ahhhh!  http://stackoverflow.com/a/1396070/3152071
-  ssh -n -o StrictHostKeyChecking=no "root@$ip" "sudo killall leds"
+  #ssh -n -o StrictHostKeyChecking=no "root@$ip" "sudo killall leds"
 
-  echo "returned $?"
+  if ! grep "$mac" ledsdis.txt; then 
+     if ssh -n -o StrictHostKeyChecking=no "root@$ip" "systemctl disable /root/DigitPanelDemo/ledsd.service"; then
+
+   	echo success
+	echo $mac >>ledsdis.txt
+    else 
+	echo failed $?
+
+    fi
+
+  else 
+
+    echo "already found $mac"
+
+  fi
+
+  
 	
   # echo "$when" "$ip"
 
