@@ -37,4 +37,4 @@ while IFS=' ' read -r when mac ip hostname; do
 	
   # echo "$when" "$ip"
 
-done < seen.lnk
+done < leases.lnk
