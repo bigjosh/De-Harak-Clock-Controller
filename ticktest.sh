@@ -5,7 +5,7 @@ wipe () {
 
 	for row in $(seq 0 58); do 
 
-		./udpopc "$1" "$2" 0 $row 0 25
+		./udpopc "$1" "$2" 0 59 0 25
 		# sleep 0.01
 
 	done
@@ -36,11 +36,11 @@ while true; do
 
 		done < leases.lnk
 
-		sleep 2
+		sleep 1
 
 		# braodscast off to all
 
- 		./udpopc 192.168.174.255 000000 0 59 0 25
+ 		./udpopc 192.168.174.255 000030 0 59 0 25
 
 		sleep 1
 

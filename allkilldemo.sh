@@ -11,6 +11,11 @@ while IFS=' ' read -r when mac ip hostname; do
   # if the line has more than three fields, `field3` will get the all the values, including the third field, including the delimiter(s)
 
   echo "Calling $ip..."
+
+     if ssh -n -o StrictHostKeyChecking=no "root@$ip" "sudo killall leds"; then
+        echo "Process killed"
+     fi
+
   #sshpass -p temppwd ssh "debian@$ip" ssh -o StrictHostKeyChecking=no root "sudo killall leds"
   #ssh o StrictHostKeyChecking=no root "root@$ip" "sudo killall leds"
  
@@ -20,7 +25,7 @@ while IFS=' ' read -r when mac ip hostname; do
   if ! grep "$mac" ledsdis.txt; then 
      if ssh -n -o StrictHostKeyChecking=no "root@$ip" "systemctl disable /root/DigitPanelDemo/ledsd.service"; then
 
-   	echo success
+   	echo "Service disabled"
 	echo $mac >>ledsdis.txt
     else 
 	echo failed $?
@@ -29,7 +34,7 @@ while IFS=' ' read -r when mac ip hostname; do
 
   else 
 
-    echo "already found $mac"
+    echo "already found $mac ($ip)"
 
   fi
 
