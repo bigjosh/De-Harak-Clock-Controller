@@ -3,11 +3,10 @@
 
 wipe () {
 
-	for col in $(seq 0 25); do 
+	for row in $(seq 0 58); do 
 
-		./udpopc "$1" "$2" 0 59 0 $col
-#		./udpopc "$1" "$2" 0 59 0 25
-		 sleep 0.02
+		./udpopc "$1" "$2" 0 59 0 25
+		# sleep 0.01
 
 	done
 
@@ -19,7 +18,7 @@ wipe () {
 while true; do  
 
 
-	for color in "8F0000" "008F00" "00008F"; do
+	for color in "FF0000" "00FF00" "0000FF"; do
 
 		# Scan though all active DHCP leases and send a GREEN screen to each
 		# Then wiat a second and send a red bradcast. Repeat
@@ -34,7 +33,6 @@ while true; do
 		  echo "Color $color to ip $ip..."
 
 	      wipe $ip $color
-	   #   wipe 192.168.174.255 $color
 
 		done < leases.lnk
 
@@ -42,7 +40,7 @@ while true; do
 
 		# braodscast off to all
 
- 		./udpopc 192.168.174.255 000030 0 59 0 25
+ 		./udpopc 192.168.174.255 000000 0 59 0 25
 
 		sleep 1
 
