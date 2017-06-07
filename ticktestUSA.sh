@@ -1,25 +1,12 @@
 #!/bin/sh
 
+# Cycle red white and blue though the panels
 
-wipe () {
 
-	for col in $(seq 0 25); do 
-
-		./udpopc "$1" "$2" 0 59 0 $col
-#		./udpopc "$1" "$2" 0 59 0 25
-		 sleep 0.02
-
-	done
-
-   	return 0
-}
-
-#stop though some nice colors
+RWB=(FF0000 707070 0000FF)
 
 while true; do  
 
-
-	for color in "Ff0000" "777777" "0000ff"; do
 
 		# Scan though all active DHCP leases and send a GREEN screen to each
 		# Then wiat a second and send a red bradcast. Repeat
@@ -31,21 +18,24 @@ while true; do
 		  # if the line has less than three fields, the missing fields will be set to to an empty string
 		  # if the line has more than three fields, `field3` will get the all the values, including the third field, including the delimiter(s)
 
-		  echo "Color $color to ip $ip..."
+ 	          color=$((RANDOM % 3 ))
 
-	      wipe $ip $color
+		  colorstr=${RWB[ $color ] }
+
+		  echo "Color $colorstr to ip $ip..."
+
+     		  ./udpopc "$ip" "$colostr" 0 59 0 25
+
 	   #   wipe 192.168.174.255 $color
 
 		done < leases.lnk
 
-		sleep 1
+#		sleep 1
 
 		# braodscast off to all
 
- 		./udpopc 192.168.174.255 000030 0 59 0 25
+# 		./udpopc 192.168.174.255 000030 0 59 0 25
 
 		sleep 1
-
-	done
 
 done
