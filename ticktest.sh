@@ -19,7 +19,7 @@ wipe () {
 while true; do  
 
 
-	for color in "Ff0000" "777777" "0000ff"; do
+	for color in "3f0000" "003f00" "222222"; do
 
 		# Scan though all active DHCP leases and send a GREEN screen to each
 		# Then wiat a second and send a red bradcast. Repeat
@@ -33,7 +33,9 @@ while true; do
 
 		  echo "Color $color to ip $ip..."
 
-	      wipe $ip $color
+ 		./udpopc $ip $color 0 59 0 25
+
+	   #   wipe $ip $color
 	   #   wipe 192.168.174.255 $color
 
 		done < leases.lnk
