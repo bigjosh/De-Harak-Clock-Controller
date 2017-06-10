@@ -7,10 +7,22 @@
 #
 # Press save when done to write the entires to the dhcphosts file
 # dhcp-hostsfile = /etc/dhcp-hostsfile.conf
+#
+# format for that file is mac,name
+#
+# this depends on the DNSMASQ being used and configured correctly
 
-i=0
 
-#read leases file line by line and make menu
+containsElement () {
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
+}
+
+#read leases file line by line and make an associative array of mac:name
+
+declare -A list
+
 while read p
 do
 
@@ -21,13 +33,10 @@ do
 #	echo "0=${arr[0]} 1=${arr[1]}"
 
 
-	# MAC first
-    list[i]=${arr[1]}
+	# name is 3rd thing on leases file line (IP is second)
+    list[${arr[1]}]="${arr[3]}"
 
-	# DNS Name second
-    list[i+1]=${arr[3]}
-    ((i+=2))
-done <leases.txt
+done </var/lib/misc/dnsmasq.leases
 
 # all active machines now loaded in arr
 
@@ -38,31 +47,90 @@ current=${list[0]}
 
 while [ "$finished" = false ] ; do
 
+	#build the command line for the menu from the ass array
+
+	i=0
+
+	# loop though keys
+	
+	for K in "${!list[@]}"; do 
+
+	    menu[i]="$K"
+	    menu[i+1]="${list[$K]}"
+	    ((i+=2))
+
+	done
+
+	# DNS Name second
+
 	mac=$(
-		whiptail --default-item "$current" --menu "Pick an address" --ok-button "Blink (enter)" --cancel-button "Save (esc)" 24 70 18 "${list[@]}" 3>&2 2>&1 1>&3
+		whiptail --default-item "$current" --menu "Pick an address" --ok-button "Blink (enter)" --cancel-button "Save" 24 60 18 "${menu[@]}" 3>&2 2>&1 1>&3
 	)
 
 	response=$?
 
-	if [ $response -eq 0 ]; then
+	if (( $response == 0 )); then
 
-		echo $mac
-		read
+			# they picked a line, lets figure out which one
 
-		current=$mac
+			name="${list[$mac]}"
+
+			newname=$(
+				whiptail --inputbox --ok-button "Ok (enter)" --cancel-button "Cancel (esc)" "New name for $name" 8 60  3>&2 2>&1 1>&3
+			)
+
+			if [[ ! -z "$newname" ]]; then
+
+				list[$mac]="$newname"
+
+			fi
+
+			current=$mac
+
+	elif (( $response == 1 )); then
+
+		# save 
+
+		echo "Saving to /etc/dhcp-hostsfile.conf..."
+
+		tmpfile=$(mktemp /tmp/digitpicker.XXXXXX)
+
+		# loop though keys and create entries in host file
+	
+		for K in "${!list[@]}"; do 
+
+			echo "$K,${list[$K]}" >>"$tmpfile"
+
+		done		
+
+		echo "New Host file created." 
+
+		#overwrite old file
+
+		sudo cp "$tmpfile" /etc/dhcp-hostsfile.conf
+
+		rm "$tmpfile"
 
 
-	else
-
-		echo Finsihed
-		read
+		echo "Host file updated." 
 
 		finished=true
+
+	elif (( $response == 255 )); then
+
+		whiptail --yesno "Quit without saving?" 8 40 
+
+		if [ $? -eq 0 ]; then
+
+			echo "Quiting without saving...."
+			finished=true
+
+		fi
 
 	fi
 
 
 done
 
-# restart dhcp server so it reads new assignments
-# service dhcpd restart
+# restart dhcp server so it reads new hostfile
+sudo systemctl restart dnsmasq
