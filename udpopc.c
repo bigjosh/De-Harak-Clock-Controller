@@ -67,12 +67,13 @@ void opensocket(const char *deststr) {
 	serv_addr.sin_port = htons(OPCPORT);
 
 	//	inet_aton(deststr, serv_addr.sin_addr)		// This version does direct IP no DNS
-	
-	
-	if (inet_pton(AF_INET, deststr , &serv_addr.sin_addr)==0)
+
+	int retv=inet_aton(deststr, &serv_addr.sin_addr);
+
+	if (retv!=1)
 			
 	{
-        fprintf(stderr, "inet_aton() failed\n");
+        fprintf(stderr, "inet_pton() failed %d '%s'\n",retv,deststr);
         exit(1);
 	}	
 	

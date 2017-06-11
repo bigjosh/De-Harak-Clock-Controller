@@ -30,10 +30,14 @@ while true; do
 
 	for color in "3f0000" "003f00" "222222"; do
 
-		for i in {0..4}; do
+		for i in {0..71}; do
 
- 		./udpopc ${digits[i]} $color 0 59 0 25
-		sleep 1
+		name=${digits[i]}
+
+		ip=$(getent hosts $name | awk '{ print $1 }')
+
+ 		./udpopc $ip $color 0 59 0 25
+		#sleep 1
 		done < leases.lnk
 
 		sleep 1
