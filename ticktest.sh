@@ -1,43 +1,39 @@
-#!/bin/sh
+# Cycle though colors, sending lighting each digit in sequence and then clearing the board
+
+d=0
+
+digits=()
+
+for i in {1..12}; do
+
+	digits[d]=$(printf "h%02d" $i)
+	((d+=1))
+
+done
+
+for i in {0..59}; do
+
+	digits[d]=$(printf "m%02d" $i)
+
+echo $(printf "%02dm" $i)
+	((d+=1))
+
+done
+
+echo digits
 
 
-wipe () {
-
-	for col in $(seq 0 25); do 
-
-		./udpopc "$1" "$2" 0 59 0 $col
-#		./udpopc "$1" "$2" 0 59 0 25
-		 sleep 0.02
-
-	done
-
-   	return 0
-}
-
-#stop though some nice colors
+#step though some nice colors
 
 while true; do  
 
 
 	for color in "3f0000" "003f00" "222222"; do
 
-		# Scan though all active DHCP leases and send a GREEN screen to each
-		# Then wiat a second and send a red bradcast. Repeat
+		for i in {0..4}; do
 
-		# ':' is the delimiter here, and there are three fields on each line in the file
-		# IFS set below is restricted to the context of `read`, it doesn't affect any other code
-		while IFS=' ' read -r when mac ip hostname; do
-		  # process the fields
-		  # if the line has less than three fields, the missing fields will be set to to an empty string
-		  # if the line has more than three fields, `field3` will get the all the values, including the third field, including the delimiter(s)
-
-		  echo "Color $color to ip $ip..."
-
- 		./udpopc $ip $color 0 59 0 25
-
-	   #   wipe $ip $color
-	   #   wipe 192.168.174.255 $color
-
+ 		./udpopc ${digits[i]} $color 0 59 0 25
+		sleep 1
 		done < leases.lnk
 
 		sleep 1

@@ -15,72 +15,83 @@
 #include <netdb.h> 
 #include <arpa/inet.h>
 
-// Command line utility to send a frame of UDP OPC data to a a ledscape listener
-
-#define SIZE_X 59
-#define SIZE_Y 26
-
-#define PIN_COUNT 6
-
-#define ASPECT_RATIO (16.0/23.0)        // Width/heigh (these are the imperical measurements in mm)
-
-unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
-unsigned char g[SIZE_X][SIZE_Y];     // Buffer of RGB values
-unsigned char b[SIZE_X][SIZE_Y];     // Buffer of RGB values
-
-#define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
-
-#define OPC_BYTECOUNT (SIZE_X*(PIN_COUNT*ROWS_PER_PIN)*3)       // 3 bytes per pixel for RGB
+#include "udpopc.h"
 
 #define OPC_HEADERSIZE 4 		// 4 bytes in opc header
 #define OPC_BUFFERSIZE (OPC_HEADERSIZE + OPC_BYTECOUNT)
 
 
-unsigned char opcbuffer[ OPC_BUFFERSIZE ];   //Convert the buffer to a single char for each R,G, & B 
+OPC_BUFFER *createOPCbuffer(unsigned buffer_len) {
 
-void initopcheader() {
-		
+	OPC_BUFFER *opc_buffer = malloc(OPC_HEADERSIZE + buffer_len);
+
+	if (!opc_buffer) return opc_buffer;
+
 	opcbuffer[0]=0x00;		// Channel=0 
 	opcbuffer[1]=0x00;		// Command=0	
 	opcbuffer[2]=(OPC_BYTECOUNT>>8);		// len MSB
 	opcbuffer[3]=(OPC_BYTECOUNT&0xff);	// len LSB
 	
+	return opc_buffer;
 }
-
-
 
 #define OPCPORT 7890
 
-struct sockaddr_in serv_addr;
-int sockfd, i, slen=sizeof(serv_addr);
 
-void opensocket(const char *deststr) {
+OPC_SOCKET *createOPCSocket() {
+
+	OPC_SOCKET opc_socket = malloc(sizeof(OPC_SOCKET);
+
+	if (!opc_socket) return opc_socket;
 		
-	sockfd= socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	opc_socket->sockfd= socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+	if (opc_socket->sockfd < 0) {
+		free(opc_socket); 
+		return(-100);
+	}
 
 	int broadcastEnable=1;
-	int ret=setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
 
+	int ret=setsockopt(opc_socket->sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
 
-	bzero(&serv_addr, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(OPCPORT);
+	if (ret < 0) {
+		flclose(opc_socket->sockfd);
+		free(opc_socket);
+		return(-101);
+	}
 
-	//	inet_aton(deststr, serv_addr.sin_addr)		// This version does direct IP no DNS
-	
-	
-	if (inet_pton(AF_INET, deststr , &serv_addr.sin_addr)==0)
-			
-	{
-        fprintf(stderr, "inet_aton() failed\n");
-        exit(1);
-	}	
-	
+	reurn(opc_socket);
     
 } 
 
 
-void sendOPCPixels() {
+int setOPCdest(OPC_DEST *opc_dest, constr char *dest) {
+
+	struct sockaddr_in serv_addr = opc_dest->serv_addr;
+
+	inet_pton(AF_INET, dest , serv_addr );
+	
+	bzero(serv_addr, sizeof(serv_addr));
+	serv_addr->sin_family = AF_INET;
+	serv_addr->sin_port = htons(OPCPORT);
+	
+	return( inet_pton(AF_INET, dest , serv_addr.sin_addr)));
+	
+	//	return(inet_aton(deststr, serv_addr.sin_addr)));		// This version does direct IP no DNS
+
+	//(struct sockaddr*)&serv_addr
+
+}
+
+int sendOPC(OPC_SOCKET *opc_socket, OPC_DEST *opc_dest, OPC_BUFFER *opc_buffer) {
+
+	return(  sendto( opc_socket->sockfd, opc_buffer->buffer , opc_buffer->size, 0, OPC_DEST->serv_addr , sizeof(struct serv_addr) ) );  // 0 is the flags
+
+}
+
+
+void sendOPC( OPC_SOCKET opc_socket , ) {
 	
 	initopcheader();			// TODO: Only do this once per run
 

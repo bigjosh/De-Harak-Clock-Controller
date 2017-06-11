@@ -12,13 +12,6 @@
 #
 # this depends on the DNSMASQ being used and configured correctly
 
-
-containsElement () {
-  local e
-  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
-  return 1
-}
-
 #read leases file line by line and make an associative array of mac:name
 
 declare -A names
