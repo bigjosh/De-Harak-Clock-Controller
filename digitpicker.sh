@@ -21,7 +21,8 @@ containsElement () {
 
 #read leases file line by line and make an associative array of mac:name
 
-declare -A list
+declare -A names
+declare -A addresses
 
 while read p
 do
@@ -34,7 +35,11 @@ do
 
 
 	# name is 3rd thing on leases file line (IP is second)
-    list[${arr[1]}]="${arr[3]}"
+    names[${arr[1]}]="${arr[3]}"
+
+    addresses[${arr[1]}]="${arr[2]}"
+
+
 
 done </var/lib/misc/dnsmasq.leases
 
@@ -43,7 +48,7 @@ done </var/lib/misc/dnsmasq.leases
 finished=false
 
 #start with first item selected
-current=${list[0]}
+current=${names[0]}
 
 while [ "$finished" = false ] ; do
 
@@ -53,10 +58,10 @@ while [ "$finished" = false ] ; do
 
 	# loop though keys
 	
-	for K in "${!list[@]}"; do 
+	for K in "${!names[@]}"; do 
 
 	    menu[i]="$K"
-	    menu[i+1]="${list[$K]}"
+	    menu[i+1]="${names[$K]}"
 	    ((i+=2))
 
 	done
@@ -73,7 +78,20 @@ while [ "$finished" = false ] ; do
 
 			# they picked a line, lets figure out which one
 
-			name="${list[$mac]}"
+			address="${addresses[$mac]}"
+
+			#blink it
+
+			./udpopc $address 800000 0 59 0 25
+			sleep 0.1
+
+			./udpopc $address 008000 0 59 0 25
+			sleep 0.1
+
+			./udpopc $address 000080 0 59 0 25
+			sleep 0.1
+
+			name="${names[$mac]}"
 
 			newname=$(
 				whiptail --inputbox --ok-button "Ok (enter)" --cancel-button "Cancel (esc)" "New name for $name" 8 60  3>&2 2>&1 1>&3
@@ -81,7 +99,7 @@ while [ "$finished" = false ] ; do
 
 			if [[ ! -z "$newname" ]]; then
 
-				list[$mac]="$newname"
+				names[$mac]="$newname"
 
 			fi
 
@@ -97,9 +115,9 @@ while [ "$finished" = false ] ; do
 
 		# loop though keys and create entries in host file
 	
-		for K in "${!list[@]}"; do 
+		for K in "${!names[@]}"; do 
 
-			echo "$K,${list[$K]}" >>"$tmpfile"
+			echo "$K,${names[$K]}" >>"$tmpfile"
 
 		done		
 
