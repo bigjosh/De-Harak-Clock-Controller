@@ -1,3 +1,4 @@
+#!/bin/bash
 # Cycle though colors, sending lighting each digit in sequence and then clearing the board
 
 d=0

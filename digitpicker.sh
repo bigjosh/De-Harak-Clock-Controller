@@ -73,15 +73,18 @@ while [ "$finished" = false ] ; do
 
 			address="${addresses[$mac]}"
 
-			#blink it
 
+			#broadcast to turn off all
+			./udpopc 192.168.174.255 000020 0 59 0 25
+
+			#blink  selected digit
 			./udpopc $address 800000 0 59 0 25
 			sleep 0.1
 
 			./udpopc $address 008000 0 59 0 25
 			sleep 0.1
 
-			./udpopc $address 000080 0 59 0 25
+			./udpopc $address 800000 0 59 0 25
 			sleep 0.1
 
 			name="${names[$mac]}"

@@ -24,6 +24,20 @@
 
 #define ASPECT_RATIO (16.0/23.0)        // Width/heigh (these are the imperical measurements in mm)
 
+#define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
+
+#define OPC_BYTECOUNT (SIZE_X*(PIN_COUNT*ROWS_PER_PIN)*3)       // 3 bytes per pixel for RGB
+
+#define OPC_HEADERSIZE 4 		// 4 bytes in opc header
+#define OPC_BUFFERSIZE (OPC_HEADERSIZE + OPC_BYTECOUNT)
+
+typedef struct {
+	unsigned size;
+	unsigned char *buffer;
+} OPC_BUFFER;
+
+OPC_BUFFER *createOPCbuffer( unsigned size_x , unsigned size_y);
+
 typedef struct {
 	unsigned char r[FRAME_SIZE_X][FRAME_SIZE_Y];     // Buffer of RGB values
 	unsigned char g[FRAME_SIZE_X][FRAME_SIZE_Y];     // Buffer of RGB values
@@ -32,18 +46,20 @@ typedef struct {
 
 typedef struct {
 	int sockfd;
-	int slen;
-} OPCSOCKET;
+} OPC_SOCKET;
 
 OPCSOCKET createOPCSocket();
 
+
 typedef struct {
 
-	struct sockaddr_in serv_addr;
+	struct serv_addr serv_addr;
 
-} OPCDEST;
+} OPC_DEST;
 
-int setOPCdest(struct sockaddr_in *serv_addr ,  constr char *dest) {
+int setOPCdest( OPC_DEST *opc_dest ,  constr char *dest) {
+
+	struct sockaddr_in serv_addr = opc_dest->serv_addr;
 
 	bzero(serv_addr, sizeof(serv_addr));
 	serv_addr->sin_family = AF_INET;
@@ -52,7 +68,10 @@ int setOPCdest(struct sockaddr_in *serv_addr ,  constr char *dest) {
 
 }
 
-void sendFrame( OPCSOCKET FRAME *frame ,  )
+int sendOPC(OPC_SOCKET *opc_socket, OPC_DEST *opc_dest, OPC_BUFFER *opc_buffer) {
+
+}
+
 
 int main( int argc, char **argv) {
 	
