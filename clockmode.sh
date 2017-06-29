@@ -1,0 +1,167 @@
+#!/bin/bash
+# THis is the actually clock! Put the digits up every second. Make sure local clock has right time.
+
+d=0
+color_red=700000
+color_blue=000070
+color_white=555555
+color_bg=100c00 
+
+#echo Setting up arrarys....
+
+#IP addresses for top panel
+top_addr=()
+
+for h in {1..12}; do
+
+	top_addr[h]=$( getent hosts $(printf "h%02d" $h) | awk '{ print $1 }')
+done
+
+#IP ddresses for bottom panel
+bot_addr=()
+for m in {0..59}; do
+
+	bot_addr[m]=$( getent hosts $(printf "m%02d" $m) | awk '{ print $1 }')
+
+done
+
+#set the color of a digit in the minutes section
+#param 1=digit number 0-59
+#param 2=minutes
+#param 3=seconds
+#we deal with IP address so we don't have to precompute
+
+# note that when seconds and minutes collide, seconds win
+
+function botsetcolor()
+{
+
+    case $1 in
+    
+        $3)                         # digit is seconds
+            color=$color_white             
+            ;;
+        $2)                         # digit is minutes
+            color=$color_blue
+            ;;
+        *)
+            color=$color_bg
+            ;;
+    esac
+
+    ./udpopc $1 $color 0 59 0 25 >/dev/null
+    echo "M $1 $2 $3 " "./udpopc $1 $color 0 59 0 25"
+}
+
+
+#param 1 =digit
+#param 2= hour 
+#we deal with IP address so we don't have to precompute
+
+function hsetcolor()
+{
+
+   case $1 in
+
+        $2)
+            color=$color_red
+            ;;
+        *)
+            color=$color_bg
+            ;;
+    esac
+    
+    ./udpopc $1 $color 0 59 0 25 >/dev/null
+    #echo "H" $1 $2 " ./udpopc $1 $color 0 59 0 25"
+
+}
+
+
+
+# keep track of previous second so we can turn it off quickly for a smoother transision.
+# fist time just send back to ourselves since we don't have a previous
+# there is no "black hole" IP address in IP4
+
+h_prev_ip=127.0.0.1
+m_prev_ip=127.0.0.1
+s_prev_ip=127.0.0.1
+
+#echo starting to clock!
+
+while true; do  
+
+    # Get hour in current time zone 12 hour format 
+    # note that you must use the format versions with a leading 0 or else it will be interpreted as 
+    # octal! Yikes!
+    
+    h=`TZ=":America/New_York" date +%-I`
+    m=`date +%-M`
+    s=`date +%-S`    
+
+    #fetch IP addresses for relevant digits
+    h_ip=${top_addr[$h]}
+    m_ip=${bot_addr[$m]}
+    s_ip=${bot_addr[$s]}
+    
+	# fist do a quick update to get changed digits lit up correctly
+    
+    #hour panel easy because no collisions
+           
+    
+    #hour
+    
+    hsetcolor $h_ip  $h_ip        
+        
+    #erase prev hour only if changed, otherwise it will just blink briefly
+              
+    if [ "$h_prev_ip" != "$hip" ]; then    
+        hsetcolor $h_prev_ip  $h_ip        
+    fi
+    
+       
+    #quickly update the digits that could have changed in the minute panel
+
+    botsetcolor $s_ip       $m_ip   $s_ip       #update s
+    botsetcolor $s_prev_ip  $m_ip   $s_ip       #off previous s
+
+    botsetcolor $m_ip       $m_ip   $s_ip       #update m
+    botsetcolor $m_prev_ip  $m_ip   $s_ip       #off previous m
+
+    
+    #save for next pass
+    s_prev_ip=$s_ip
+    m_prev_ip=$m_ip
+    h_prev_ip=$h_ip
+
+    
+	# next do a full refresh just to keep off digits from going into demo mode 
+	# and clean up any missed UDP packets
+
+	#do minutes section first since they change more
+
+    for m_step in {0..59}; do
+    
+        m_step_ip=${bot_addr[$m_step]}
+    
+        botsetcolor $m_step_ip   $m_ip   $s_ip 
+    
+    done
+
+	#...and hours....
+    for h_step in {1..12}; do
+    
+        h_step_ip=${top_addr[$h_step]}
+    
+        hsetcolor $h_step_ip   $h_ip
+
+    done
+    
+	
+    #sleep until next second happens
+    #this is so ugly in so many ways, bash you monster
+
+    # date +%N
+    sleep 0.$((2000000000-1$(date +%N)))
+     
+ done
+

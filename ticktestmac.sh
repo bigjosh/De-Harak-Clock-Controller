@@ -1,25 +1,12 @@
 #!/bin/sh
 
 
-wipe () {
-
-	for col in $(seq 0 25); do 
-
-		./udpopc "$1" "$2" 0 59 0 $col
-#		./udpopc "$1" "$2" 0 59 0 25
-		 sleep 0.02
-
-	done
-
-   	return 0
-}
-
 #stop though some nice colors
 
 while true; do  
 
 
-	for color in "3f0000" "003f00" "222222"; do
+	for color in "df0000" "00df00" "0000df" "606060"; do
 
 		# Scan though all active DHCP leases and send a GREEN screen to each
 		# Then wiat a second and send a red bradcast. Repeat
@@ -44,7 +31,7 @@ while true; do
 
 		# braodscast off to all
 
- 		./udpopc 192.168.174.255 000030 0 59 0 25
+ 		./udpopc 192.168.174.255 202010 0 59 0 25
 
 		sleep 1
 

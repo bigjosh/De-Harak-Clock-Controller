@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Cycle red white and blue though the panels
+# Cycle red white and blue though the panels in MAC address order
 
 
 RWB=(FF0000 707070 0000FF)
