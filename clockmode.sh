@@ -1,7 +1,6 @@
 #!/bin/bash
-# THis is the actually clock! Put the digits up every second. Make sure local clock has right time.
+# This is the actual clock! Put the digits up every second. Make sure local clock has right time.
 
-d=0
 color_red=700000
 color_blue=000070
 color_white=555555
@@ -24,6 +23,7 @@ for m in {0..59}; do
 	bot_addr[m]=$( getent hosts $(printf "m%02d" $m) | awk '{ print $1 }')
 
 done
+
 
 #set the color of a digit in the minutes section
 #param 1=digit number 0-59
@@ -50,7 +50,7 @@ function botsetcolor()
     esac
 
     ./udpopc $1 $color 0 59 0 25 >/dev/null
-    echo "M $1 $2 $3 " "./udpopc $1 $color 0 59 0 25"
+    #echo "M $1 $2 $3 " "./udpopc $1 $color 0 59 0 25"
 }
 
 
@@ -138,30 +138,39 @@ while true; do
 	# and clean up any missed UDP packets
 
 	#do minutes section first since they change more
-
-    for m_step in {0..59}; do
     
-        m_step_ip=${bot_addr[$m_step]}
-    
-        botsetcolor $m_step_ip   $m_ip   $s_ip 
+    for scan_ip in "${bot_addr[@]}"; do
+            
+        botsetcolor $scan_ip   $m_ip   $s_ip 
     
     done
 
 	#...and hours....
-    for h_step in {1..12}; do
     
-        h_step_ip=${top_addr[$h_step]}
-    
-        hsetcolor $h_step_ip   $h_ip
+    for scan_ip in "${top_addr[@]}"; do
+        
+        hsetcolor $scan_ip   $h_ip
 
     done
     
-	
-    #sleep until next second happens
-    #this is so ugly in so many ways, bash you monster
-
-    # date +%N
-    sleep 0.$((2000000000-1$(date +%N)))
+    
+    # update the background to be yellow at night to match the 
+    # old incadecent backlights
+    # no point in showing durring the day becuase not visible, so save
+    # a bit of power and wear and tear. 
+    
+    if (( $h > 7 )) || (( $h < 5 )); then     
+        color_bg=100c00         
+    else
+        color_bg=000000        
+    fi
+    
+        
+           
+    # sleep until next round second
+    # https://stackoverflow.com/a/33226295/3152071
+        
+    sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))    
      
  done
 
