@@ -156,16 +156,20 @@ while true; do
     
     # update the background to be yellow at night to match the 
     # old incadecent backlights
-    # no point in showing durring the day becuase not visible, so save
-    # a bit of power and wear and tear. 
+    # no point in showing durring the day becuase not visible, so save    
+    # a bit of power and wear and tear by onlt turning on
+    # when pople are likely to see it
     
-    if (( $h > 7 )) || (( $h < 5 )); then     
-        color_bg=100c00         
-    else
-        color_bg=000000        
-    fi
+    h24=`TZ=":America/New_York" date +%k`
     
+    # off btween 3AM and 8PM
         
+    if (( $h24 > 3 )) && (( $h24 < 20 )); then     
+        color_bg=000000
+    else
+        color_bg=100c00                 
+    fi
+            
            
     # sleep until next round second
     # https://stackoverflow.com/a/33226295/3152071
