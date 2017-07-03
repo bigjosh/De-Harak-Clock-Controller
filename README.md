@@ -6,7 +6,7 @@ Each digit pannel is running the LEDscape package to drive the attached LEDs.
 
 The master controller uses DNSMASQ to hand out IP addresses and maps those address to digits by MAC address using DNS entries in the dhcp-hosts file.
 
-Each panel gets a DNS name that is mapped to its location on the clock. The top row of digits are `T01` - `T12`, and the bottom 5 rows are `B00` - B59`.
+Each panel gets a DNS name that is mapped to its location on the clock. The top row of digits are `T01` - `T12`, and the bottom 5 rows are `B00` - `B59`.
 
 # Installation
 
