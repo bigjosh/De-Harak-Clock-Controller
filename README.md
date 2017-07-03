@@ -8,6 +8,14 @@ The master controller uses DNSMASQ to hand out IP addresses and maps those addre
 
 Each panel gets a DNS name that is mapped to its location on the clock. The top row of digits are `T01` - `T12`, and the bottom 5 rows are `B00` - `B59`.
 
+# Operation
+
+The clock runs continusly using the local linux time. The timezone is set inside the `clockmode.sh` script, as are the colors for hours, minutes, seconds, and background. 
+
+In the case when minutes andsSeconds are on the smae digit, seconds win. 
+
+The background is currently set to turn on at 8PM and off at 7AM. This save a bit of power and wear as the dim background light is not visible durring daylight.
+
 # Installation
 
 Easiest way to install is to use the release in this repo to flash a new SD card. Then `cd` into the repo and do a `git pull` to make sure everything is up to date.
