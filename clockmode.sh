@@ -103,6 +103,12 @@ while true; do
     m_ip=${bot_addr[$m]}
     s_ip=${bot_addr[$s]}
     
+    # For testing, speed up hours so we can check all digits    
+    # comment next two lines for normal operations
+    #h_fast=$(( ($s % 12) + 1))
+    #h_ip=${top_addr[$h_fast]}
+    
+    
 	# fist do a quick update to get changed digits lit up correctly
     
     #hour panel easy because no collisions
@@ -134,25 +140,34 @@ while true; do
     h_prev_ip=$h_ip
 
     
-	# next do a full refresh just to keep off digits from going into demo mode 
+	# next do a refresh just to keep off digits from going into demo mode 
 	# and clean up any missed UDP packets
+    
+    # break refresh into two phases - top and bottom - becuase 
+    # every once and a while we do not have time to do everythgin in 
+    # less than one second maybe becuase of system load
 
-	#do minutes section first since they change more
+    scan_phase=$(( $s % 2 ))
     
-    for scan_ip in "${bot_addr[@]}"; do
-            
-        botsetcolor $scan_ip   $m_ip   $s_ip 
+    if [ "$scan_phase" = "0" ]; then
     
-    done
-
-	#...and hours....
-    
-    for scan_ip in "${top_addr[@]}"; do
+        for scan_ip in "${bot_addr[@]}"; do
+                
+            botsetcolor $scan_ip   $m_ip   $s_ip 
         
-        hsetcolor $scan_ip   $h_ip
+        done
+        
+    else
 
-    done
-    
+        #...and hours....
+        
+        for scan_ip in "${top_addr[@]}"; do
+            
+            hsetcolor $scan_ip   $h_ip
+
+        done
+        
+    fi    
     
     # update the background to be yellow at night to match the 
     # old incadecent backlights
