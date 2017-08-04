@@ -1,8 +1,11 @@
 #!/bin/sh
 #kill previously running copy
-sudo kill $(cat /tmp/nh.pid)
+
+if [ -e "/tmp/nh.pid" ]; then
+    sudo kill $(cat /tmp/nh.pid)
+fi
 
 #run new script with nohup
-nohup ./$1 >/dev/null &
+nohup ./$1 >/dev/null </dev/null  2>stderr.txt &
 echo $! >/tmp/nh.pid
 
