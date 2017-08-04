@@ -28,6 +28,8 @@ Make sure no other DCHP server is running (I'm looking at you dhcpdcd).
 
 Make sure DNSMASQ is enabled to run at startup.
 
+Use `sudo raspi-config` to disable graphical desktop on boot (boot into CLI).
+
 # Starting up the clock
 
 You should only need to do this after a power outage.
