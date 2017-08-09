@@ -20,6 +20,8 @@ The background is currently set to turn on at 8PM and off at 7AM. This save a bi
 
 Easiest way to install is to use the release in this repo to flash a new SD card. Then `cd` into the repo and do a `git pull` to make sure everything is up to date.
 
+Use `tzselect` to set the right timezone if nessisary.
+
 ## Manual install
 
 Copy the included dnsmasq.conf to /etc.
