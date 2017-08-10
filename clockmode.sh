@@ -113,29 +113,31 @@ while true; do
     if (( $h24 > 3 )) && (( $h24 < 20 )); then     
         color_bg=$color_bg_day
     else
-        color_bg=$color_bg_night          
-    fi
  
-    # make background visible for testing 
+        # make background visible for testing 
 
-    blink_phase=$(( $s % 4 ))
+        blink_phase=$(( $s % 4 ))
+        
+        case $blink_phase in
+
+            0)
+                color_bg=100010
+                ;;
+            1)
+                color_bg=100010
+                ;;
+            2)
+                color_bg=001000
+                ;;
+            3)
+                color_bg=001000
+                ;;
+                
+        esac   
     
-    case $blink_phase in
-
-        0)
-            color_bg=100010
-            ;;
-        1)
-            color_bg=100010
-            ;;
-        2)
-            color_bg=001000
-            ;;
-        3)
-            color_bg=001000
-            ;;
-            
-    esac   
+        # color_bg=$color_bg_night          
+    fi
+    
                 
     #fetch IP addresses for relevant digits
     h_ip=${top_addr[$h]}
@@ -151,8 +153,7 @@ while true; do
     # fist do a quick update to get changed digits lit up correctly
     
     #hour panel easy because no collisions
-           
-    
+               
     #hour
     
     hsetcolor $h_ip  $h_ip        
@@ -216,8 +217,14 @@ while true; do
     # https://stackoverflow.com/a/33226295/3152071
         
 
-    ./udpopc $s_ip 101000 0 59 0 25 >/dev/null
-    sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))
-    ./udpopc $s_ip 001010 0 59 0 25 >/dev/null
+    if (( $h24 > 3 )) && (( $h24 < 20 )); then     
+        sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))    
+    else 
+        
+        ./udpopc $s_ip 101000 0 59 0 25 >/dev/null
+        sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))
+        ./udpopc $s_ip 001010 0 59 0 25 >/dev/null
+        
+    fi
 
 done
