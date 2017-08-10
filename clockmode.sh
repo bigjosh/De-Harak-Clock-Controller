@@ -1,10 +1,12 @@
 #!/bin/bash
 # This is the actual clock! Put the digits up every second. Make sure local clock has right time.
 
-color_red=700000
-color_blue=000070
-color_white=555555
-color_bg=100b00 
+color_red="700000"
+color_blue="000070"
+color_white="555555"
+
+color_bg_day="000000"
+color_bg_night="100b00" 
 
 echo Setting up IP address arrays....
 
@@ -50,7 +52,6 @@ function botsetcolor()
     esac
 
     ./udpopc $1 $color 0 59 0 25 >/dev/null
-    #echo "M $1 $2 $3 " "./udpopc $1 $color 0 59 0 25"
 }
 
 
@@ -70,12 +71,10 @@ function hsetcolor()
             color=$color_bg
             ;;
     esac
-    
+
     ./udpopc $1 $color 0 59 0 25 >/dev/null
-    #echo "H" $1 $2 " ./udpopc $1 $color 0 59 0 25"
 
 }
-
 
 
 # keep track of previous second so we can turn it off quickly for a smoother transision.
@@ -93,11 +92,51 @@ while true; do
     # Get hour in current time zone 12 hour format 
     # note that you must use the format versions with a leading 0 or else it will be interpreted as 
     # octal! Yikes!
-    
-    h=`TZ=":America/New_York" date +%-I`
+
+    h24=`TZ=":America/New_York" date +%k`
+
+    h=$(( $h24 % 12 )) 
     m=`date +%-M`
     s=`date +%-S`    
 
+    # determine background color for this pass
+
+    # update the background to be yellow at night to match the 
+    # old incadecent backlights
+    # no point in showing durring the day becuase not visible, so save    
+    # a bit of power and wear and tear by onlt turning on
+    # when pople are likely to see it
+    
+    
+    # off btween 3AM and 8PM
+        
+    if (( $h24 > 3 )) && (( $h24 < 20 )); then     
+        color_bg=$color_bg_day
+    else
+        color_bg=$color_bg_night          
+    fi
+ 
+    # make background visible for testing 
+
+    blink_phase=$(( $s % 4 ))
+    
+    case $blink_phase in
+
+        0)
+            color_bg=100010
+            ;;
+        1)
+            color_bg=100010
+            ;;
+        2)
+            color_bg=001000
+            ;;
+        3)
+            color_bg=001000
+            ;;
+            
+    esac   
+                
     #fetch IP addresses for relevant digits
     h_ip=${top_addr[$h]}
     m_ip=${bot_addr[$m]}
@@ -109,7 +148,7 @@ while true; do
     #h_ip=${top_addr[$h_fast]}
     
     
-	# fist do a quick update to get changed digits lit up correctly
+    # fist do a quick update to get changed digits lit up correctly
     
     #hour panel easy because no collisions
            
@@ -140,8 +179,8 @@ while true; do
     h_prev_ip=$h_ip
 
     
-	# next do a refresh just to keep off digits from going into demo mode 
-	# and clean up any missed UDP packets
+    # next do a refresh just to keep off digits from going into demo mode 
+    # and clean up any missed UDP packets
     
     # break refresh into two phases - top and bottom - becuase 
     # every once and a while we do not have time to do everythgin in 
@@ -149,12 +188,20 @@ while true; do
 
     scan_phase=$(( $s % 2 ))
 
-    blink_phase=$(( $s % 4 ))
-        
- 
-    
     
     if [ "$scan_phase" = "0" ]; then
+
+        #...top digits...
+        
+        for scan_ip in "${top_addr[@]}"; do
+            
+            hsetcolor $scan_ip   $h_ip
+
+        done 
+
+    else 
+
+        #...bottom digits....
     
         for scan_ip in "${bot_addr[@]}"; do
                 
@@ -162,60 +209,15 @@ while true; do
         
         done
         
-    else
-
-        #...and hours....
-        
-        for scan_ip in "${top_addr[@]}"; do
-            
-            hsetcolor $scan_ip   $h_ip
-
-        done
-        
     fi    
     
-    # update the background to be yellow at night to match the 
-    # old incadecent backlights
-    # no point in showing durring the day becuase not visible, so save    
-    # a bit of power and wear and tear by onlt turning on
-    # when pople are likely to see it
-    
-    h24=`TZ=":America/New_York" date +%k`
-    
-    # off btween 3AM and 8PM
-        
-    if (( $h24 > 3 )) && (( $h24 < 20 )); then     
-        color_bg=000000
-    else
-        color_bg=100c00                 
-    fi
-    
-    case $blink_phase in
-
-        0)
-            color_bg=100b00
-            ;;
-        1)
-            color_bg=100000
-            ;;
-        2)
-            color_bg=001000
-            ;;
-        3)
-            color_bg=000010
-            ;;
-            
-    esac   
-                
            
     # sleep until next round second
     # https://stackoverflow.com/a/33226295/3152071
         
-    sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))    
-     
- done
 
-<br>
-<a href="https://youtu.be/8rMb_84f0gw">https://youtu.be/8rMb_84f0gw</a>
-<br>
+    ./udpopc $s_ip 101000 0 59 0 25 >/dev/null
+    sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))
+    ./udpopc $s_ip 001010 0 59 0 25 >/dev/null
 
+done
