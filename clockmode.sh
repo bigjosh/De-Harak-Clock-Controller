@@ -6,7 +6,7 @@ color_blue=000070
 color_white=555555
 color_bg=100b00 
 
-#echo Setting up arrarys....
+echo Setting up IP address arrays....
 
 #IP addresses for top panel
 top_addr=()
@@ -86,7 +86,7 @@ h_prev_ip=127.0.0.1
 m_prev_ip=127.0.0.1
 s_prev_ip=127.0.0.1
 
-#echo starting to clock!
+echo starting to clock!
 
 while true; do  
 
@@ -214,4 +214,8 @@ while true; do
     sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))    
      
  done
+
+<br>
+<a href="https://youtu.be/8rMb_84f0gw">https://youtu.be/8rMb_84f0gw</a>
+<br>
 
