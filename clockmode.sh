@@ -4,7 +4,7 @@
 color_red=700000
 color_blue=000070
 color_white=555555
-color_bg=100c00 
+color_bg=100b00 
 
 #echo Setting up arrarys....
 
@@ -148,6 +148,11 @@ while true; do
     # less than one second maybe becuase of system load
 
     scan_phase=$(( $s % 2 ))
+
+    blink_phase=$(( $s % 4 ))
+        
+ 
+    
     
     if [ "$scan_phase" = "0" ]; then
     
@@ -184,7 +189,24 @@ while true; do
     else
         color_bg=100c00                 
     fi
+    
+    case $blink_phase in
+
+        0)
+            color_bg=100b00
+            ;;
+        1)
+            color_bg=100000
+            ;;
+        2)
+            color_bg=001000
+            ;;
+        3)
+            color_bg=000010
+            ;;
             
+    esac   
+                
            
     # sleep until next round second
     # https://stackoverflow.com/a/33226295/3152071
