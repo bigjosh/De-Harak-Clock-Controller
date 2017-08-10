@@ -99,6 +99,12 @@ while true; do
     m=`date +%-M`
     s=`date +%-S`    
 
+    # clocks dont start at 0
+
+    if (( "$h" == "0" )); then
+        h=12
+    fi
+
     # determine background color for this pass
 
     # update the background to be yellow at night to match the 
@@ -144,6 +150,7 @@ while true; do
     m_ip=${bot_addr[$m]}
     s_ip=${bot_addr[$s]}
     
+
     # For testing, speed up hours so we can check all digits    
     # comment next two lines for normal operations
     #h_fast=$(( ($s % 12) + 1))
@@ -155,8 +162,8 @@ while true; do
     #hour panel easy because no collisions
                
     #hour
-    
-    hsetcolor $h_ip  $h_ip        
+
+    hsetcolor $h_ip  $h_ip
         
     #erase prev hour only if changed, otherwise it will just blink briefly
               
@@ -216,6 +223,7 @@ while true; do
     # sleep until next round second
     # https://stackoverflow.com/a/33226295/3152071
         
+   echo h24 is  $h24
 
     if (( $h24 > 3 )) && (( $h24 < 20 )); then     
         sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))    
