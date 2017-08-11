@@ -119,31 +119,9 @@ while true; do
     if (( $h24 > 3 )) && (( $h24 < 20 )); then     
         color_bg=$color_bg_day
     else
- 
-        # make background visible for testing 
-
-        blink_phase=$(( $s % 4 ))
-        
-        case $blink_phase in
-
-            0)
-                color_bg=100010
-                ;;
-            1)
-                color_bg=100010
-                ;;
-            2)
-                color_bg=001000
-                ;;
-            3)
-                color_bg=001000
-                ;;
-                
-        esac   
-    
-        # color_bg=$color_bg_night          
+        color_bg=$color_bg_night
     fi
-    
+ 
                 
     #fetch IP addresses for relevant digits
     h_ip=${top_addr[$h]}
@@ -221,16 +199,7 @@ while true; do
     
            
     # sleep until next round second
-    # https://stackoverflow.com/a/33226295/3152071
         
-    if (( $h24 > 3 )) && (( $h24 < 20 )); then  
-        ./nextsecond
-    else 
-        
-        ./udpopc $s_ip 101000 0 59 0 25 >/dev/null
-        ./nextsecond
-        ./udpopc $s_ip 001010 0 59 0 25 >/dev/null
-        
-    fi
+    ./nextsecond
 
 done
