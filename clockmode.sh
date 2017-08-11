@@ -6,7 +6,7 @@ color_blue="000070"
 color_white="555555"
 
 color_bg_day="000000"
-color_bg_night="100b00" 
+color_bg_night="111000"
 
 echo Setting up IP address arrays....
 
