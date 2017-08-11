@@ -66,3 +66,15 @@ There are several scripts showing examples of how to update the display for mode
 
 For more complicated displays, C is likely faster than shell scripts. The beginings of some C drivers are in this reop. 
 
+# The `nextsecond` utility
+
+This simple sleeps until the next second on the clock. If it is 10:55:22.75 and you run `./nextsecond`, then it will sleep for about 0.25 seconds. 
+
+The clock uses this to always start an update at the top of a second.
+
+You can test that it works by running...
+
+`./nextsecond; date "+%N"`
+
+It will print the number of nanoseconds since the last round second> I should always be < 010000000, which is 10,000,000ns, which is 10ms. 
+
