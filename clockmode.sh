@@ -223,14 +223,12 @@ while true; do
     # sleep until next round second
     # https://stackoverflow.com/a/33226295/3152071
         
-   echo h24 is  $h24
-
-    if (( $h24 > 3 )) && (( $h24 < 20 )); then     
-        sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))    
+    if (( $h24 > 3 )) && (( $h24 < 20 )); then  
+        ./nextsecond
     else 
         
         ./udpopc $s_ip 101000 0 59 0 25 >/dev/null
-        sleep 0.$(printf '%04d' $((10000 - 10#$(date +%4N))))
+        ./nextsecond
         ./udpopc $s_ip 001010 0 59 0 25 >/dev/null
         
     fi
