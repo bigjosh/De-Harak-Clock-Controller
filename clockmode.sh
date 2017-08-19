@@ -3,10 +3,16 @@
 
 color_red="700000"
 color_blue="000070"
-color_white="555555"
+color_white="303030"
 
 color_bg_day="000000"
 color_bg_night="111000"
+
+bcastip="192.168.174.255"
+
+#clear board
+./udpopc  $bcastip 000000 0 59 0 25 >/dev/null
+
 
 echo Setting up IP address arrays....
 
@@ -16,6 +22,7 @@ top_addr=()
 for h in {1..12}; do
 
 	top_addr[h]=$( getent hosts $(printf "h%02d" $h) | awk '{ print $1 }')
+    ./udpopc  ${top_addr[h]} 008000 0 59 0 25 >/dev/null
 done
 
 #IP ddresses for bottom panel
@@ -23,8 +30,11 @@ bot_addr=()
 for m in {0..59}; do
 
 	bot_addr[m]=$( getent hosts $(printf "m%02d" $m) | awk '{ print $1 }')
+    ./udpopc  ${bot_addr[m]} 008000 0 59 0 25 >/dev/null
 
 done
+
+./udpopc  $bcastip 000000 0 59 0 25 >/dev/null
 
 
 #set the color of a digit in the minutes section
