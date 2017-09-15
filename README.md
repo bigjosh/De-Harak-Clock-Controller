@@ -66,6 +66,27 @@ There are several scripts showing examples of how to update the display for mode
 
 For more complicated displays, C is likely faster than shell scripts. The beginings of some C drivers are in this reop. 
 
+# Getting a diagnostic view of the digit statuses
+
+You can use the `checkdigits.sh` script to get a quick overview of which digits are working...
+
+```
+pi@raspberrypi:~/De-Harak-Clock-Controller $ ./checkdigits.sh
+H means host not found in DNS
+P means fialed to ping
+
+  h01  Hh02H  h03   h04  Hh05H  h06  Hh07H Hh08H  h09   h10  Hh11H  h12
+  m00  Hm01H  m02   m03  Hm04H  m05  Hm06H Hm07H  m08   m09  Hm10H  m11
+  m12  Hm13H  m14   m15  Hm16H  m17  Hm18H Hm19H  m20   m21  Hm22H  m23
+  m24  Hm25H  m26   m27  Hm28H  m29  Hm30H Hm31H  m32   m33  Hm34H  m35
+  m36  Hm37H  m38   m39  Hm40H  m41  Hm42H Hm43H  m44   m45  Hm46H  m47
+  m48  Hm49H  m50   m51  Hm52H  m53  Hm54H Hm55H  m56   m57  Hm58H  m59
+pi@raspberrypi:~/De-Harak-Clock-Controller $
+
+```
+
+In this view, for example, digits `h01` and m17` are woring fine but `h11` and `12` do not have DNS entries (yikes!!!).
+
 # The `nextsecond` utility
 
 This simple sleeps until the next second on the clock. If it is 10:55:22.75 and you run `./nextsecond`, then it will sleep for about 0.25 seconds. 
