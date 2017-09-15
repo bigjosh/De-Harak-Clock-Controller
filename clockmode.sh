@@ -21,16 +21,37 @@ top_addr=()
 
 for h in {1..12}; do
 
-	top_addr[h]=$( getent hosts $(printf "h%02d" $h) | awk '{ print $1 }')
-    ./udpopc  ${top_addr[h]} 008000 0 59 0 25 >/dev/null
+    if addr=$(getent hosts $(printf "h%02d" $h)); then 
+        
+        top_addr[h]=$(echo $addr | awk '{ print $1 }')        
+        ./udpopc  ${top_addr[h]} 008000 0 59 0 25 >/dev/null
+        
+    else
+    
+        echo No DNS found for $(printf "h%02d" $h)
+        top_addr[h]="127.0.0.1"
+        
+    fi 
 done
+
 
 #IP ddresses for bottom panel
 bot_addr=()
 for m in {0..59}; do
 
-	bot_addr[m]=$( getent hosts $(printf "m%02d" $m) | awk '{ print $1 }')
-    ./udpopc  ${bot_addr[m]} 008000 0 59 0 25 >/dev/null
+
+    if addr=$(getent hosts $(printf "m%02d" $m)); then 
+        
+        bot_addr[m]=$(echo $addr | awk '{ print $1 }')
+        ./udpopc  ${bot_addr[m]} 008000 0 59 0 25 >/dev/null
+        
+    else 
+    
+        echo No DNS found for $(printf "m%02d" $m)
+        bot_addr[m]="127.0.0.1"
+        
+    fi 
+
 
 done
 

@@ -3,7 +3,7 @@
 
 
 echo "H means host not found in DNS"
-echo  "P means fialed to ping"
+echo  "P means failed to ping"
 echo
 
 # top row...
@@ -35,7 +35,7 @@ for r in {0..4}; do
 
     for c in {0..11}; do 
 
-        m=$(((r*12)+c+1))
+        m=$(((r*12)+c))
 
 
         if addr=$(getent hosts $(printf "m%02d" $m)); then 
