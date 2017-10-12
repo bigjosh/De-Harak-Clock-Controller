@@ -125,3 +125,13 @@ You can test that it works by running...
 
 It will print the number of nanoseconds since the last round second> I should always be < 010000000, which is 10,000,000ns, which is 10ms. 
 
+# Accessing individual digits remotely 
+
+From the controller, you can `ssh` onto the digits like this...
+
+```
+ssh -l root m20
+```
+
+...where `m20` is the digit you want. No password needed.
+
