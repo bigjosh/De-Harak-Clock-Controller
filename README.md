@@ -16,6 +16,69 @@ In the case when minutes and seconds are on the same digit, seconds win.
 
 The background is currently set to turn on at 8PM and off at 7AM. This saves a bit of power and wear as the dim background light is not visible during daylight.
 
+# Layout
+
+All of the wiring and controls are in the closet behind the front desk at 200 Water Street.
+
+![Equipment Layout](images/equipment.jpg)
+
+## Breaker Panel
+
+[images/breaker panel.jpg]
+
+!The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
+
+These are AFCI breakers, so they can half trip anytime there is a ground current detected. In this case, they need to be switched off and then on again to reset. 
+
+There is a master relay to the left of the panel that turns off all circuits. There is a control switch for the master breaker outside on the botom right of the clock itself...
+
+![Master Switch]([images/master switch.jpg)
+
+## Network
+
+A sigle CAT5 network cable comes in from each digit box to the patch panel. There is then a patch cable that connects that digit to one of the swtiches. The switches are configured to run at 10Mbs/half. 
+
+## Controller
+
+The controller is a Raspberri Pi computer running Raspberian Linux and the software in this repo. 
+
+The controller also connected to the switches and also has a Wifi connection to the internet via the Timer Warner Access point in the lobby. This internet connect is used to keep the local time acurate via NTP, and also provides remote access. 
+
+# Troubleshooting
+
+Listed expected order of likelyhood
+
+## Column dark
+
+Likely a blown breaker, probably after rain. Find the coresponding breaker on the panel and run the breaker reset proceedure below. 
+
+## Single digit dark or stuck
+
+First try reseting the whole column using the Breaker Reset proceedure below. If that does not work, then the panel is likely damaged and needs to be replaced with a spare. Sorry.
+
+## Digits showing slow rainbow pattern
+
+This pattern indicates that the sigit has lost its network connection with the controller. 
+
+Check the entire netwrok path from the swicth to the digit. 
+
+1) The patch cable from the switch to the patch panel
+2) The punchdown on the back of the patch panel
+3) The cable running up into the cieling and up over the roof (these cables are exposed to the elements!)
+4) The connector inside the digit box
+5) The plug going into the board on the digit panel 
+
+## Breaker will not "stick" when turned on
+
+Either...
+
+1. There is still a wet short in the circuit. You might have to wait until a dry day. 
+2. Dead breaker. Replace the breaker. 
+
+## Wrong time
+
+The controller lost its connection to the internet. Try rebooting the Timer Warner router in the lobby front desk. If the internet service has changed (front desk gets a different Wifi network), then you will need to TELNET onto the controller and update the nextwork config in the file `/etc/wpa_supplicant/wpa_supplicant.conf`.
+
 # Nightly reset
 
 There is a `chon` job that runs `midnight.sh` every night at midnight and restarts the `clockmode.sh` script every night...
@@ -53,7 +116,15 @@ You should only need to do this after a power outage.
 
 This runs the standard clock mode. The `nh` script runs it with `nohup` so it will keep running even after the terminal session ends. 
 
-Then go look at the clock. You should see most digits looking like a clock, but a few with rainbow patterns. These digits did not successfully connect to the network on boot (see [here](https://groups.google.com/forum/#!topic/beagleboard/9mctrG26Mc8%5B176-200%5D) for info). To fix these digits, they must be repowered. Find a column on the clock that has one or more unconnected digits and then find the circuit breaker that controls that column. Switch the breaker off and count to 3-Mississippi and then switch it back on. Give the column a minute to boot and usually all of the digits in that panel will successfully connect. If not, repeat until all digits are showing the clock pattern. 
+Then go look at the clock. You should see most digits looking like a clock, but a few with rainbow patterns. These digits did not successfully connect to the network on boot (see [here](https://groups.google.com/forum/#!topic/beagleboard/9mctrG26Mc8%5B176-200%5D) for info). To fix these digits, they must be repowered. Find a column on the clock that has one or more unconnected digits and then find the circuit breaker that controls that column. Run the breaker reset proceedure below.
+
+# Breaker Reset Proceedure
+
+1. Switch the breaker off (all the way to the right) until it clicks.
+2. Count to 3-Mississippi. You want a full 3 seconds here so don't rush. 
+3. Wwitch the breaker back on (to the left) until it clicks. If it does not click satisfingly, then see troubleshooting above. 
+4. Give the column a minute to boot
+5. Go out to the clock and check the digits in the reset column(s). If any are still showing the rainbow pattern, then repeat starting at step #1 until all digits are showing the clock pattern. 
 
 # Running demos
 
