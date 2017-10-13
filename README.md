@@ -24,7 +24,7 @@ All of the wiring and controls are in the closet behind the front desk at 200 Wa
 
 ## Breaker Panel
 
-![Breaker Panel](images/breaker panel.jpg)
+![Breaker Panel](images/breaker%20panel.jpg)
 
 !The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
 
@@ -32,7 +32,7 @@ These are AFCI breakers, so they can half trip anytime there is a ground current
 
 There is a master relay to the left of the panel that turns off all circuits. There is a control switch for the master breaker outside on the bottom right of the clock itself...
 
-![Master Switch](images/master switch.jpg)
+![Master Switch](images/master%20switch.jpg)
 
 ## Network
 
