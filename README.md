@@ -24,7 +24,7 @@ All of the wiring and controls are in the closet behind the front desk at 200 Wa
 
 ## Breaker Panel
 
-[images/breaker panel.jpg]
+![Breaker Panel](images/breaker panel.jpg)
 
 !The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
 
