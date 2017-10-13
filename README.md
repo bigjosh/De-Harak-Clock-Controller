@@ -56,7 +56,14 @@ Likely a blown breaker, probably after rain. Find the corresponding breaker on t
 
 First try reseting the whole column using the Breaker Reset procedure below. If that does not work, then the panel is likely damaged and needs to be replaced with a spare. Sorry.
 
-## Digits showing slow rainbow pattern
+## Whole clock showing slow rainbow error pattern
+
+There was either a power failure or the controller is unplugged. 
+
+Try running the startup procedure below. If you are not able to access the controller to run the procedure, check to see if it has power and is connected to the network. 
+
+
+## Individual Digit(s) showing slow rainbow error pattern
 
 This pattern indicates that the digit has lost its network connection with the controller. 
 
