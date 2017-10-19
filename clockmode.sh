@@ -137,6 +137,19 @@ while true; do
         h=12
     fi
 
+    # These tests are temporary to skip over digit m01 which
+    # is not working right now. 
+
+    if (( "$m" == "1" )); then
+        m=2
+    fi
+
+    if (( "$s" == "1" )); then
+        s=2
+    fi
+
+
+
     # determine background color for this pass
 
     # update the background to be yellow at night to match the 
