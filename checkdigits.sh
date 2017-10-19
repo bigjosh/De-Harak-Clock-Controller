@@ -14,7 +14,7 @@ for h in {1..12}; do
         
         ip=$(echo $addr | awk '{ print $1 }')        
         
-        if ping -c 2 $ip >/dev/null; then         
+        if ping -c 1 $ip >/dev/null; then         
             printf "  h%02d " $h
         else
             printf " Ph%02dP" $h

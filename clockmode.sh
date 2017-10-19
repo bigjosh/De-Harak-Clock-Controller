@@ -4,6 +4,7 @@
 color_red="700000"
 color_blue="000070"
 color_white="303030"
+color_green="007000"
 
 color_bg_day="000000"
 color_bg_night="111000"
@@ -72,7 +73,7 @@ function botsetcolor()
     case $1 in
     
         $3)                         # digit is seconds
-            color=$color_white             
+            color=$color_green             
             ;;
         $2)                         # digit is minutes
             color=$color_blue
