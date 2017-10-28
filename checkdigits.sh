@@ -42,7 +42,7 @@ for r in {0..4}; do
             
             ip=$(echo $addr | awk '{ print $1 }')        
             
-            if ping -c 2 $ip >/dev/null; then         
+            if ping -c 1 $ip >/dev/null; then         
                 printf "  m%02d " $m
             else
                 printf " Pm%02dP" $m

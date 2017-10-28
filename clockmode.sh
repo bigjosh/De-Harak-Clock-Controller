@@ -141,11 +141,11 @@ while true; do
     # is not working right now. 
 
     if (( "$m" == "1" )); then
-        m=2
+        m=1
     fi
 
     if (( "$s" == "1" )); then
-        s=2
+        s=1
     fi
 
 
