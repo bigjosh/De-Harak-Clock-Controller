@@ -30,29 +30,9 @@ typedef struct {
 	unsigned char b[FRAME_SIZE_X][FRAME_SIZE_Y];     // Buffer of RGB values
 } FRAME;
 
-typedef struct {
-	int sockfd;
-	int slen;
-} OPCSOCKET;
-
-OPCSOCKET createOPCSocket();
-
-typedef struct {
-
-	struct sockaddr_in serv_addr;
-
-} OPCDEST;
-
-int setOPCdest(struct sockaddr_in *serv_addr ,  constr char *dest) {
-
-	bzero(serv_addr, sizeof(serv_addr));
-	serv_addr->sin_family = AF_INET;
-	serv_addr->sin_port = htons(OPCPORT);
-	return(inet_aton(deststr, serv_addr.sin_addr)));
-
-}
-
 void sendFrame( OPCSOCKET FRAME *frame ,  )
+
+
 
 int main( int argc, char **argv) {
 	
