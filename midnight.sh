@@ -1,2 +1,2 @@
-cd /home/pi/De-Harak-Clock-Controller/
+cd /home/pi/clock-controller/
 ./nh.sh clockmode.sh

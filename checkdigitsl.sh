@@ -1,8 +1,9 @@
+#!/usr/bin/env bash
+
 # show status of all digits in a line suitable for logging
 
 # line starts with time followed by one letter per digit in order
 # .=Good,P=ping ailed, H=Host lookup failed
-
 
 # timestamp
 
@@ -10,6 +11,7 @@
 printf $(date "+%k%M ")
 
 # top row...
+
 
 for h in {1..12}; do
 

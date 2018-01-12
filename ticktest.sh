@@ -29,7 +29,7 @@ echo digits
 while true; do  
 
 
-	for color in "3f0000" "003f00" "222222"; do
+	for color in "3f0000" "003f00" "00003f"; do
 
 		for i in {0..71}; do
 

@@ -1,3 +1,5 @@
+echo This should be in the directory called /home/pi/clock-controller
+
 echo Making leds executable...
 make
 
@@ -20,3 +22,10 @@ sudo systemctl restart dnsmasq.service
 #echo Making service install script executable...
 #chmod +x install-service.sh
 #echo Run install-service.sh to make ledsd start on boot...
+
+echo Making dir for the digits log 
+
+mkdir /home/pi/logs
+
+echo Now make sure you chontab -e the stuff in the file crontab.txt!
+
