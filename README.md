@@ -96,6 +96,47 @@ There is a `chon` job that runs `midnight.sh` every night at midnight and restar
 
 Use `crontab -e` if you ever need to edit or re-add this line. 
 
+# Digit Health Logging 
+
+There is a `cron` job that runs `checkdigitsl.sh` every minute. 
+
+It writes to log files in `/home/pi/logs/` with the date as the name. 
+
+Each line starts with the 24h time followed by one char per digit. Hours first, then minutes.
+
+|Char|Meaning
+|-|-|
+|.|Good|
+|P|No response to ping, but name in DNS so digit was alive recently|
+|H|No hostname in DNS, so digit has not DHCPed in a while and entry expired|
+
+For example:
+
+```
+pi@raspberrypi:~/clock-controller $ cat ~/logs/20180112.log
+1607......P......P..............P........................................H..
+1608......P......P..............P........................................H..
+1609......P......P..............P........................................H..
+1610......P......P..............P........................................H..
+1611......P......P..............P........................................H..
+```
+
+Here is what the clock looked like whne those log lines were written...
+
+```
+pi@raspberrypi:~/clock-controller $ ./checkdigits.sh
+H means host not found in DNS
+P means failed to ping
+
+  h01   h02   h03   h04   h05   h06  Ph07P  h08   h09   h10   h11   h12
+  m00  Pm01P  m02   m03   m04   m05   m06   m07   m08   m09   m10   m11
+  m12   m13   m14   m15  Pm16P  m17   m18   m19   m20   m21   m22   m23
+  m24   m25   m26   m27   m28   m29   m30   m31   m32   m33   m34   m35
+  m36   m37   m38   m39   m40   m41   m42   m43   m44   m45   m46   m47
+  m48   m49   m50   m51   m52   m53   m54   m55   m56  Hm57H  m58   m59
+```
+
+This log format is helpful to see what happened if several digits have problems at once. You can go back and see if, say, a whole column went out at the same moment - in which case it was probably a breaker problem. 
 
 # Installation
 
@@ -105,11 +146,9 @@ Use `tzselect` to set the right timezone if necessary.
 
 ## Manual install
 
-Copy the included dnsmasq.conf to /etc.
+Clone this repo into `/home/pi/clock-controller`
 
-Make sure no other DCHP server is running (I'm looking at you dhcpdcd).
-
-Make sure DNSMASQ is enabled to run at startup.
+Run `install.sh`
 
 Use `sudo raspi-config` to disable graphical desktop on boot (boot into CLI).
 
@@ -119,7 +158,7 @@ You should only need to do this after a power outage.
 
 `cd` into the repo and run...
 
-`./nh.sd clockmode.sh`
+`./nh.sh clockmode.sh`
 
 This runs the standard clock mode. The `nh` script runs it with `nohup` so it will keep running even after the terminal session ends. 
 
