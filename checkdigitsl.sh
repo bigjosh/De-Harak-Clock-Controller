@@ -7,7 +7,7 @@
 
 # timestamp
 
-##printf $(date "+%y%m%d %k%M ")
+##printf $(date "+%y%m%d %H%M ")
 printf $(date "+%k%M ")
 
 # top row...
