@@ -77,38 +77,23 @@
     <div class="container" id="controlform">
         <div class="top-buffer">
             <div id="light-color-group" class="btn-group btn-group-justified " data-toggle="buttons">
+            
                 <label class="btn btn-danger">
-                    <input type="radio" name="color" value="FF0000" />Red</input>
+                    <input type="submit" name="color" id="red" />Red</input>
                 </label>
                 <label class="btn btn-default pick btn-white">
-                    <input type="radio" name="color" value="FFFFFF">White</input>
+                    <input type="submit" name="color" id="white">White</input>
                 </label>
                 <label class="btn btn-primary active">
-                    <input type="radio" checked name="color" value="0000FF"> Blue
-                    </input>
+                    <input type="submit" checked name="color" id="blue">Blue</input>
                 </label>
                 <label class="btn btn-default btn-incan">
-                    <input type="radio" name="color" value="FF9933">Glow</input>
+                    <input type="submit" name="color" id="glow">Glow</input>
                 </label>
+                
             </div>
         </div>
 
-        <div class="top-buffer">
-            <div id="light-brightness-group" class="btn-group btn-group-justified " data-toggle="buttons">
-                <label class="btn btn-default btn-grey-dark">
-                    <input type="radio" name="brightness" value="0.10" id="light-brightness-4">10%</input>
-                </label>
-                <label class="btn btn-default btn-grey-mid">
-                    <input type="radio" name="brightness" value="0.25" id="light-brightness-3">25%</input>
-                </label>
-                <label class="btn btn-default btn-grey-light active">
-                    <input type="radio" checked id="half" name="brightness" value="0.50" id="light-brightness-2">50%</input>
-                </label>
-                <label class="btn btn-default btn-white pick">
-                    <input type="radio" id="full" name="brightness" value="1.0" id="light-brightness-1">100%</input>
-                </label>
-            </div>
-        </div>
 
         <br />
 
@@ -130,36 +115,18 @@
 
 <div class="top-buffer">
             
-            <button type="submit" id="set_button" class="btn btn-info btn-lg" style="width: 100%;">Show!</button>
+            <button type="submit" id="set_button" class="btn btn-info btn-lg" style="width: 100%;" disabled>Show!</button>
 </div>
-
-        <div class="top-buffer">
-
-<button type="submit" id="bullseye_button" class="btn btn-info"  style="width: 100%;" >Hypno!</button></td>
-</div>
-
-
-
-        <div class="top-buffer">
-
-            <button type="submit" id="stars_button" class="btn btn-info"  style="width: 100%;">Sparkle!</button>
-    
-        </div>
-
                 
 
 <hr>
 
         <div class="top-buffer">
-            <button type="submit" id="plasma_button" class="btn btn-info" style="width: 100%;">Plasma!</button>
+            <button type="submit" id="ticktest" class="btn btn-info" style="width: 100%;">TickTest!</button>
         </div>
 
         <div class="top-buffer">
-            <button type="submit" id="rockrose_button" class="btn btn-info" style="width: 100%;">Rockrose!</button>
-        </div>
-
-        <div class="top-buffer">
-            <button type="submit" id="off_button" class="btn .btn-default" style="width: 100%;">Off!</button>
+            <button type="submit" id="clockmode" class="btn .btn-default" style="width: 100%;">Clock Mode!</button>
         </div>
 
 
@@ -196,89 +163,30 @@
 
         function gatherFormData(pressedButtonId) {
             
-            console.log( pressedButtonId );
+            console.log( pressedButtonId  );
             
-            if (pressedButtonId=='plasma_button') {
                             
-                submitData( "P" , "000000" );
-                return;
-                
-            }
+            submitData( pressedButtonId, "000000" );
             
+            //colorParameter = $("input[name=color]:checked").val();
 
-            if (pressedButtonId=='rockrose_button') {
-                            
-                submitData( "R" , "000000" );
-                return;
+
+            //if (brightnessParameter == null || colorParameter == null) {
+
+            //    alert("Please select values for Color and Brightness");
+            //    return;
                 
-            }
-
-            if (pressedButtonId=='off_button') {
-                            
-                submitData( "F" , "000000" );
-                return;
-                
-            }
-            
-            
-            brightnessParameter = $("input[name=brightness]:checked").val();
-            colorParameter = $("input[name=color]:checked").val();
-
-
-            if (brightnessParameter == null || colorParameter == null) {
-
-                alert("Please select values for Color and Brightness");
-                return;
-                
-            }
-
-            colorParameter = updateColorLuminance(colorParameter, brightnessParameter);
-                 
-            if (pressedButtonId=="set_button") {
-                
-
-                if (brightnessParameter == "1.0" && (colorParameter.toLowerCase() == "ffffff" || colorParameter.toLowerCase() == "ff9933")) {
-
-
-                    // Demo power supply cant supply enough to do full area at 100% white or glow
-
-                    command = "H"; //Reduced area 
-
-                    // Tell the user we reduced..
-                    $("#nofull").show();
-
-                } else {
-
-                    command = "F";
-                }
-
-                submitData(command, colorParameter);
-                return;
-            }
-            
-            if (pressedButtonId=='bullseye_button') {
-                            
-                submitData( "B" , colorParameter );
-                return;
-                
-            }
-            
-            if (pressedButtonId=='stars_button') {
-                            
-                submitData( "S" , colorParameter );
-                return;
-                
-            }
-            
+            //}
             
         }
+
 
         function submitData(commandString, colorString) {
             
 //            $("button[type=submit]").attr("disabled", "disabled");
             
             $.ajax({
-                url: "cgi-bin/light.cgi?" + commandString + colorString + "&when=" + $.now()
+                url: "cgi-bin/light.cgi?" + commandString + "&" + colorString + "&when=" + $.now()
             }).done(function () {
                 // resetForm(); Save Values...
 //                $("button[type=submit]").removeAttr("disabled");
@@ -294,37 +202,6 @@
             $("button[type=submit]").removeAttr("disabled");
         }
 
-        function updateColorLuminance(hex, lum) {
-
-            // validate hex string
-            hex = String(hex).replace(/[^0-9a-f]/gi, '');
-
-            lum = lum || 0;
-
-
-
-            // Peak power = 300 watts /  27 strings  ( 97 pixels per string)
-            // Power usage per string per color at 100%:
-            // Red = 1.2A
-            // Blue = 1.525
-            // Green = 1.536
-            // ==============
-            // White ~= 4A 
-
-            // We only have 50A power supply available, so limit brightness
-            // aproximate 1.5A per color becuase I don't know javascript
-
-            // convert to decimal and change luminosity
-            var rgb = '',
-                c, i;
-            for (i = 0; i < 3; i++) {
-                c = parseInt(hex.substr(i * 2, 2), 16);
-                c = Math.round(Math.min(Math.max(0, (c * lum)), 255)).toString(16);
-                rgb += ("00" + c).substr(c.length);
-            }
-
-            return rgb;
-        }
     </script>
 
 </body>
