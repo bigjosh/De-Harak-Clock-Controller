@@ -28,4 +28,7 @@ echo Making dir for the digits log
 mkdir /home/pi/logs
 
 echo Now make sure you chontab -e the stuff in the file crontab.txt!
+echo Also install apache2 and the webcontroller install.sh if you want remote access!
+echo Also install the pipereader service with is used to start effects by the webservice (and others)
+
 

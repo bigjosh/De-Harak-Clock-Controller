@@ -1,0 +1,12 @@
+[Unit]
+Description=Listen for commands for clock effects
+After=ledscape.service
+
+[Service]
+WorkingDirectory=/usr/local/bin/
+ExecStart=/usr/local/bin/pipereader.sh
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+

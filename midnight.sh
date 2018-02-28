@@ -1,2 +1,2 @@
-cd /home/pi/clock-controller/
-./nh.sh clockmode.sh
+pipe=/tmp/clockcommands
+echo "clockmode" >$pipe

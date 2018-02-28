@@ -154,13 +154,17 @@ Use `sudo raspi-config` to disable graphical desktop on boot (boot into CLI).
 
 # Starting up the clock
 
-You should only need to do this after a power outage.
+The clock should start automatically on boot when the `pipereader.service` starts. 
 
-`cd` into the repo and run...
+You can also manally send a command to the pipereader to switch to clockmode like this...
 
-`./nh.sh clockmode.sh`
+     echo "clockmode" >/tmp/clockcommands
+     
+The pipereader is a little script that reads lines form the `clockcommands` FIFO and then executes scripts in the clock software install directory. The FIFO makes it
+so that anyone can send commands without path or permisions issues (like the cgi script for the webinterface), and also serializes the commands so they don't
+step on each other. 
 
-This runs the standard clock mode. The `nh` script runs it with `nohup` so it will keep running even after the terminal session ends. 
+# After power failure
 
 Then go look at the clock. You should see most digits looking like a clock, but a few with rainbow patterns. These digits did not successfully connect to the network on boot (see [here](https://groups.google.com/forum/#!topic/beagleboard/9mctrG26Mc8%5B176-200%5D) for info). To fix these digits, they must be repowered. Find a column on the clock that has one or more unconnected digits and then find the circuit breaker that controls that column. Run the breaker reset proceedure below.
 
@@ -174,15 +178,17 @@ Then go look at the clock. You should see most digits looking like a clock, but 
 
 # Running demos
 
-There are lots of demos and test patterns available. The `nh.sh` will automatically stop whatever script is currently driving the display (typically `clockmode.sh`) and run the specified script. 
+There are lots of demos and test patterns available. 
+
+Each has a command that the pipereader should know. Look in `pipereader.sh` for a list.
 
 For example, to start the sinbowwave pattern (a sinbow is a rainbow by with sine shaped color curves), you'd enter...
 
 ```
-./nh.sh sinbowwave.sh
+echo "sinbowwave" >/tmp/clockcommands
 ```
 
-Always remember to [restart clock mode](#start) when you are done!
+Always remember to [restart clock mode](#start) when you are done! (Or chon should do it automatically at midnight)
  
 
 # Replacing a digit panel
@@ -203,7 +209,9 @@ There is a hidden wifi access point in the digit 57 box to give direct access to
 
 There are several scripts showing examples of how to update the display for modes other than clock. All use OPC over UDP to set the pixels in each digit. `ticktest.sh` is a good place to start. It lights up each digit in sequence with red, green, blue, and white. Note that you can use any RGB color. To run `ticktest`, enter...
 
-`./nh.sh ticktest.sh`
+```
+echo "sinbowwave" >/tmp/clockcommands
+```
 
 For more complicated displays, C is likely faster than shell scripts. The beginnings of some C drivers are in `maptest.c`. 
 
@@ -251,4 +259,12 @@ ssh -l root m20
 ```
 
 ...where `m20` is the digit you want. No password needed.
+
+
+# Logs
+A chon takes a log snapshot of all working digits every minute using `checkdigitsl.sh `. They are in `/home/pi/logs/`.
+
+
+
+
 
