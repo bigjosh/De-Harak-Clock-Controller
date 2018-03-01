@@ -9,7 +9,7 @@ while true; do
 		while IFS=' ' read -r color; do
 
 			# braodscast off to all
-	 		./udpopc 192.168.174.255 $color 0 59 0 25
+	 	 	./udpopc 192.168.174.255 $color 0 59 0 25
 
 		
 			sleep 0.1

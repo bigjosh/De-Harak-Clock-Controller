@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Content-type: text/html"
 echo ''
-echo 'Query=' $QUERY_STRING
+echo 'Query=' $QUERY_STRING ' <BR>'
 
 #this is called from the ajax on the controller webpage
 #it pipes the commands into a pipe waiting that was started automatically at boot
@@ -17,20 +17,23 @@ pipe=/tmp/clockcommands
 # make sure multipule copies of this script dont step on each other...
 
 
-if [ "$QUERY_STRING" == "leases"* ]; then
+if [[ "$QUERY_STRING" == "leases"* ]]; then
+
+        echo "<h2>Active digit leases</h2>"
 
         echo "<pre>"
         cat /var/lib/misc/dnsmasq.leases
-        echo "</pre>"
+        echo "</pre><br><hr><center>Hit back to return to menu</center>"
+        
 
 else
+
+    echo "sending to pipe<br>"
     #pass command to the command reader
 
     echo "$QUERY_STRING" >$pipe
 
-
 fi
 
-echo "GOT:$QUERY_STRING" >> /tmp/light.log
-echo 'CGI Color set<br>'
+echo 'Done<br>'
 

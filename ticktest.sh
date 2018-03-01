@@ -33,13 +33,17 @@ while true; do
 
 		for i in {0..71}; do
 
-		name=${digits[i]}
+            name=${digits[i]}
 
-		ip=$(getent hosts $name | awk '{ print $1 }')
+            ip=$(getent hosts $name | awk '{ print $1 }')
+            
+            if [[ "$ip" != "" ]] ; then 
 
- 		./udpopc $ip $color 0 59 0 25
-		#sleep 1
-		done < leases.lnk
+                ./udpopc $ip $color 0 59 0 25
+                
+            fi
+            
+		done 
 
 		sleep 1
 

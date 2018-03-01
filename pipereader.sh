@@ -22,7 +22,15 @@ echo Starting pipereader
 
 pipe=/tmp/clockcommands
 
-trap "rm -f $pipe" EXIT
+cleanup () { 
+    #kill any child processes
+    # this does not seem to work.
+    pkill -P $$
+    # remove the pipe for next time
+    rm -f $pipe
+}
+
+trap cleanup EXIT
 
 
 if [[ ! -p $pipe ]]; then
@@ -47,16 +55,29 @@ do
                  echo "Got ticktest" 
                  # kill any running child process
                  pkill -P $$
-                 ./ticktest.sh &
+                 ./ticktest.sh > /dev/null &
                  ;;
                  
             "clockmode"*) 
                  echo "Got clockmode" 
                  # kill any running child process
                  pkill -P $$                 
-                 ./clockmode.sh &
+                 ./clockmode.sh > /dev/null &
+                 ;;
+
+            "scatter"*) 
+                 echo "Got scatter" 
+                 # kill any running child process
+                 pkill -P $$                 
+                 ./ticktestmac.sh  > /dev/null & 
                  ;;
                  
+            "sinebow"*) 
+                 echo "Got sinebow" 
+                 # kill any running child process
+                 pkill -P $$                 
+                 ./sinebow.sh > /dev/null &  
+                 ;;                                
                  
             *)
                 echo "Unknown request"
