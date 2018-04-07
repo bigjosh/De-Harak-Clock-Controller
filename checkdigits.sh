@@ -2,32 +2,45 @@
 # using DNS and ping
 
 
-echo "H means host not found in DNS"
-echo  "P means failed to ping"
-echo
+echo "N means host not found in DNS"
+echo  "T means  ping timeout"
+echo "- means good ping"
 
 # top row...
 
 for h in {1..12}; do
 
-    if addr=$(getent hosts $(printf "h%02d" $h)); then 
-        
-        ip=$(echo $addr | awk '{ print $1 }')        
-        
-        if ping -c 1 $ip >/dev/null; then         
-            printf "  h%02d " $h
-        else
-            printf " Ph%02dP" $h
-        fi
-    else
-    
-        printf " Hh%02dH" $h
-        
-    fi 
+	name=$(printf "h%02d" $h)
+
+ 	#echo name $name
+
+	printf " $name"
+
+        timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
+
+        case $? in
+
+            0)
+		
+	    	printf " "
+		;;
+
+	    1)
+         	printf "P"
+		;;
+
+            2)    
+       		printf "N"
+		;;
+
+            124)    ## special value returned by timeout command
+       		printf "T"
+		;;
+	esac
+
 done
 
 printf "\n"
-
 
 # bottom rows...
 
@@ -37,21 +50,34 @@ for r in {0..4}; do
 
         m=$(((r*12)+c))
 
+        name=$(printf "m%02d" $m)
 
-        if addr=$(getent hosts $(printf "m%02d" $m)); then 
-            
-            ip=$(echo $addr | awk '{ print $1 }')        
-            
-            if ping -c 1 $ip >/dev/null; then         
-                printf "  m%02d " $m
-            else
-                printf " Pm%02dP" $m
-            fi
-        else
-        
-            printf " Hm%02dH" $m
-            
-        fi 
+	printf " $name"
+
+        #echo name $name
+
+        timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
+
+        case $? in
+
+            0)
+		
+	    	printf " "
+		;;
+
+	    1)
+         	printf "P"
+		;;
+
+            2)    
+       		printf "N"
+		;;
+            124)    ## special value returned by timeout command
+       		printf "T"
+		;;
+
+	esac
+
     done
     
     printf "\n"
