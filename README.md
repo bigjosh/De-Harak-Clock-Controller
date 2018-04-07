@@ -38,6 +38,17 @@ There is a master relay to the left of the panel that turns off all circuits. Th
 
 A single CAT5 network cable comes in from each digit box to the patch panel. There is then a patch cable that connects that digit to one of the switches. The switches are configured to run at 10Mbs/half. 
 
+The raspberrypi also uses Wifi to connect out to the internet through an access point under the front desk in the lobby. 
+
+![Wifi link](images/wifi.png)
+
+This internet connection is used to...
+
+1. Keep the clock synced to the correct time and adjust for DST
+2. Provide the web-based demo control page using a Dataplicity wormhole. The page is served by a local Apache running on the pi.
+3. Allow remote SSH connections via both Dataplicity and R3motiT. 
+
+
 ## Controller
 
 The controller is a Raspberri Pi computer running Raspberian Linux and the software in this repo. 
