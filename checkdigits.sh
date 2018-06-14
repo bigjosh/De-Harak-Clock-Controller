@@ -10,33 +10,35 @@ echo "- means good ping"
 
 for h in {1..12}; do
 
-	name=$(printf "h%02d" $h)
+    name=$(printf "h%02d" $h)
 
- 	#echo name $name
+    #echo name $name
 
-	printf " $name"
+    printf " $name"
 
-        timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
+    timeout 0.1 ping -c 1 $name   >/dev/null 2>/dev/null
+    
+    result=$?
 
-        case $? in
+    case $result in
 
-            0)
-		
-	    	printf " "
-		;;
+        0)
+        
+            printf " "
+        ;;
 
-	    1)
-         	printf "P"
-		;;
+        1)
+            printf "P"
+        ;;
 
-            2)    
-       		printf "N"
-		;;
+        2)    
+            printf "N"
+        ;;
 
-            124)    ## special value returned by timeout command
-       		printf "T"
-		;;
-	esac
+        *)    ## special value returned by timeout command
+            printf "X"
+        ;;
+    esac
 
 done
 
@@ -51,32 +53,39 @@ for r in {0..4}; do
         m=$(((r*12)+c))
 
         name=$(printf "m%02d" $m)
+        
+        printf " $name"
+       
+        #echo 
+        #echo "timeout 0.1 ping -c 1 $name"
+        #echo
 
-	printf " $name"
 
-        #echo name $name
+        timeout 0.1 ping -c 1 $name  >/dev/null 2>/dev/null
+        
+        result=$?
+        
+        #echo result is $result
 
-        timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
+        case $result in
+        
+            0)      
+            printf " "
+            ;;
 
-        case $? in
-
-            0)
-		
-	    	printf " "
-		;;
-
-	    1)
-         	printf "P"
-		;;
+            1)
+            printf "P"
+            ;;
 
             2)    
-       		printf "N"
-		;;
-            124)    ## special value returned by timeout command
-       		printf "T"
-		;;
+            printf "N"
+            ;;
+            
+            *)    ## special value returned by timeout command
+            printf "X"
+            ;;
 
-	esac
+        esac
 
     done
     

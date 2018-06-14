@@ -2,8 +2,8 @@
 # using DNS and ping
 
 
-echo "<div bgcolor=#F5B7B1>N</div> means host not found in DNS<br>"
-echo "<div bgcolor=#F5B7B1>P</div> means  ping timeout<br>"
+echo '<block style="background-color:#F5B7B1">N</block> means host not found in DNS<br>'
+echo '<block style="background-color:#F5B7B1">P</block> means  ping timeout<br>'
 
 # showcell takes h or m as first arg, then number as Second arg
 
@@ -26,10 +26,11 @@ for h in {1..12}; do
 
  	#echo name $name
 
+    timeout 0.1 ping -c 1 $name   >/dev/null 2>/dev/null
 
-    timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
+    result=$?
 
-    case $? in
+    case $result in
 
         0)
     
@@ -47,6 +48,11 @@ for h in {1..12}; do
         124)    ## special value returned by timeout command
             showcell "h"  $h  "T"  "#F5B7B1"
             ;;
+            
+        *)    ## unexpected result
+            showcell "h"  $h  "X"  "##FFFF00"
+            ;;
+            
 	esac
 
 done
@@ -62,12 +68,15 @@ for r in {0..4}; do
 
         m=$(((r*12)+c))
 
-
+        name=$(printf "m%02d" $m)        
+        
         #echo name $name
 
-        timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
+        timeout 0.1 ping -c 1 $name   >/dev/null 2>/dev/null
 
-        case $? in
+        result=$?
+
+        case $result in
 
             0)
         
@@ -85,6 +94,11 @@ for r in {0..4}; do
             124)    ## special value returned by timeout command
                 showcell "m"  $m  "T"  "#F5B7B1"
                 ;;
+                
+            *)    ## unexpected result
+                showcell "h"  $h  "X"  "##FFFF00"
+                ;;
+                
         esac
 
     done
