@@ -26,7 +26,17 @@ if [[ "$QUERY_STRING" == "leases"* ]]; then
         echo "</pre><br><hr><center>Hit back to return to menu</center>"
         
 
-else
+
+elif [[ "$QUERY_STRING" == "pingtest"* ]]; then
+
+        echo "<h2>Ping Test</h2>"
+
+        ./checkdigitsHTML.sh
+        echo "<br><hr><center>Hit back to return to menu</center>"
+        
+
+       
+ else
 
     echo "sending to pipe<br>"
     #pass command to the command reader
@@ -36,4 +46,3 @@ else
 fi
 
 echo 'Done<br>'
-
