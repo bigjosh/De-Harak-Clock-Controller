@@ -6,7 +6,7 @@
 while true; do  
 
 
-	for color in "df0000" "00df00" "0000df" "606060"; do
+	for color in "3f0000" "003f00" "00003f" "202020"; do
 
 		# Scan though all active DHCP leases and send a GREEN screen to each
 		# Then wiat a second and send a red bradcast. Repeat

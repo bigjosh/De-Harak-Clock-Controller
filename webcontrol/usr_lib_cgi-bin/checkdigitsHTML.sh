@@ -26,7 +26,7 @@ for h in {1..12}; do
 
  	#echo name $name
 
-    timeout 0.1 ping -c 1 $name   >/dev/null 2>/dev/null
+    timeout 0.3 ping -c 1 $name   >/dev/null 2>/dev/null
 
     result=$?
 
@@ -72,7 +72,7 @@ for r in {0..4}; do
         
         #echo name $name
 
-        timeout 0.1 ping -c 1 $name   >/dev/null 2>/dev/null
+        timeout 0.2 ping -c 1 $name   >/dev/null 2>/dev/null
 
         result=$?
 
