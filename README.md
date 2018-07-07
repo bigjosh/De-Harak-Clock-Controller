@@ -271,6 +271,15 @@ ssh -l root m20
 
 ...where `m20` is the digit you want. No password needed.
 
+# New digits
+
+Instructions to build new digit panels...
+https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
+
+Then flash the LEDscape image on to the Beaglebone...
+https://github.com/bigjosh/LEDscape/releases/tag/1.0
+
+Then assign the digit to the clock using the `digitpicker.sh` script. 
 
 # Logs
 A chon takes a log snapshot of all working digits every minute using `checkdigitsl.sh `. They are in `/home/pi/logs/`.
