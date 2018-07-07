@@ -26,13 +26,15 @@ All of the wiring and controls are in the closet behind the front desk at 200 Wa
 
 ![Breaker Panel](images/breaker%20panel.jpg)
 
-!The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
+The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
 
 These are AFCI breakers, so they can half trip anytime there is a ground current detected. In this case, they need to be switched off and then on again to reset. 
 
 There is a master relay to the left of the panel that turns off all circuits. There is a control switch for the master breaker outside on the bottom right of the clock itself...
 
 ![Master Switch](images/master%20switch.jpg)
+
+THIS SWITCH IS WATER DAMAGED AND SWITCHES UNPREDICABLY. It is therefore important to keep the "relay" breaker turned off. This leaves the relay in the `ON` postion and disables the non-functional outdoor switch. 
 
 ## Network
 
