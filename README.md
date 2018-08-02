@@ -281,6 +281,19 @@ https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
 Then flash the LEDscape image on to the Beaglebone...
 https://github.com/bigjosh/LEDscape/releases/tag/1.0
 
+Install the bbbphy fix. You can do this from the mast controller with ![pushphyfix](https://github.com/bigjosh/pushphyfix)...
+`./push.sh dest`
+
+...where `dest` is the hostname or IP address of the digit like `h01` or `m45`.
+
+Disable the spiral demo...
+```
+ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl stop ledsd.service
+ssh root@h01 -oStrictHostKeyChecking=no sudo killall leds
+```
+
+... where `h01` is the digit. 
+
 Then assign the digit to the clock using the `digitpicker.sh` script. 
 
 # Logs
