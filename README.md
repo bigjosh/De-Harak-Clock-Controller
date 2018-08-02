@@ -281,10 +281,11 @@ https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
 Then flash the LEDscape image on to the Beaglebone...
 https://github.com/bigjosh/LEDscape/releases/tag/1.0
 
-Install the bbbphy fix. You can do this from the mast controller with ![pushphyfix](https://github.com/bigjosh/pushphyfix)...
-`./push.sh dest`
+Install the bbbphy fix. You can do this from the mast controller with [pushphyfix](https://github.com/bigjosh/pushphyfix)...
 
-...where `dest` is the hostname or IP address of the digit like `h01` or `m45`.
+`./push.sh h06`
+
+...where `h06` is the hostname or IP address of the digit like `h01` or `m45`.
 
 Disable the spiral demo...
 ```
