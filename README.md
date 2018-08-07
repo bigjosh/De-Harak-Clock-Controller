@@ -288,8 +288,13 @@ Install the bbbphy fix. You can do this from the mast controller with [pushphyfi
 ...where `h06` is the hostname or IP address of the digit like `h01` or `m45`.
 
 Disable the spiral demo...
+
 ```
-ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl stop ledsd.service
+sudo systemctl disable /root/DigitPanelDemo/ledsd.service
+```
+
+```
+ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl disable /root/DigitPanelDemo/ledsd.service
 ssh root@h01 -oStrictHostKeyChecking=no sudo killall leds
 ```
 
