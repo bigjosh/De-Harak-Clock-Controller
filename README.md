@@ -281,17 +281,32 @@ https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
 Then flash the LEDscape image on to the Beaglebone...
 https://github.com/bigjosh/LEDscape/releases/tag/1.0
 
-Install the bbbphy fix. You can do this from the mast controller with [pushphyfix](https://github.com/bigjosh/pushphyfix)...
+Once you've check the spiral pattern, we need to get the digit ready for the clock by killing the spiral test pattern and installing the `bbbphyfix`. 
+
+## If you are on the BBB
+
+```
+sudo systemctl disable /root/DigitPanelDemo/ledsd.service
+sudo killall leds
+```
+
+```
+rm -r bbbphyfix/
+git clone https://github.com/bigjosh/bbbphyfix
+cd bbbphyfix/
+./install
+sync
+```
+
+## Remotely from the master controller
+
+Install the bbbphy fix remotely.Note you must have installed [pushphyfix](https://github.com/bigjosh/pushphyfix) on the controller...
 
 `./push.sh h06`
 
 ...where `h06` is the hostname or IP address of the digit like `h01` or `m45`.
 
 Disable the spiral demo...
-
-```
-sudo systemctl disable /root/DigitPanelDemo/ledsd.service
-```
 
 ```
 ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl disable /root/DigitPanelDemo/ledsd.service
