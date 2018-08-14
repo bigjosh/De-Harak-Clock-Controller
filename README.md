@@ -26,13 +26,15 @@ All of the wiring and controls are in the closet behind the front desk at 200 Wa
 
 ![Breaker Panel](images/breaker%20panel.jpg)
 
-!The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
+The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
 
 These are AFCI breakers, so they can half trip anytime there is a ground current detected. In this case, they need to be switched off and then on again to reset. 
 
 There is a master relay to the left of the panel that turns off all circuits. There is a control switch for the master breaker outside on the bottom right of the clock itself...
 
 ![Master Switch](images/master%20switch.jpg)
+
+THIS SWITCH IS WATER DAMAGED AND SWITCHES UNPREDICABLY. It is therefore important to keep the "relay" breaker turned off. This leaves the relay in the `ON` postion and disables the non-functional outdoor switch. 
 
 ## Network
 
@@ -271,6 +273,49 @@ ssh -l root m20
 
 ...where `m20` is the digit you want. No password needed.
 
+# New digits
+
+Instructions to build new digit panels...
+https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
+
+Then flash the LEDscape image on to the Beaglebone...
+https://github.com/bigjosh/LEDscape/releases/tag/1.0
+
+Once you've check the spiral pattern, we need to get the digit ready for the clock by killing the spiral test pattern and installing the `bbbphyfix`. 
+
+## If you are on the BBB
+
+```
+sudo systemctl disable /root/DigitPanelDemo/ledsd.service
+sudo killall leds
+```
+
+```
+rm -r bbbphyfix/
+git clone https://github.com/bigjosh/bbbphyfix
+cd bbbphyfix/
+./install
+sync
+```
+
+## Remotely from the master controller
+
+Install the bbbphy fix remotely.Note you must have installed [pushphyfix](https://github.com/bigjosh/pushphyfix) on the controller...
+
+`./push.sh h06`
+
+...where `h06` is the hostname or IP address of the digit like `h01` or `m45`.
+
+Disable the spiral demo...
+
+```
+ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl disable /root/DigitPanelDemo/ledsd.service
+ssh root@h01 -oStrictHostKeyChecking=no sudo killall leds
+```
+
+... where `h01` is the digit. 
+
+Then assign the digit to the clock using the `digitpicker.sh` script. 
 
 # Logs
 A chon takes a log snapshot of all working digits every minute using `checkdigitsl.sh `. They are in `/home/pi/logs/`.
