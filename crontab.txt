@@ -25,6 +25,7 @@
 # a few days of running. :(
 
 00 00 * * * /home/pi/clock-controller/midnight.sh
+00 01 * * * /home/pi/clock-controller/downupwlan0.sh
 
 # log the working digit scan every minute to a daily file
 

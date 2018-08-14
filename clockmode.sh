@@ -1,13 +1,13 @@
 #!/bin/bash
 # This is the actual clock! Put the digits up every second. Make sure local clock has right time.
 
-color_red="700000"
-color_blue="000070"
+color_red="400000"
+color_blue="000040"
 color_white="303030"
-color_green="007000"
+color_green="0060040"
 
 color_bg_day="000000"
-color_bg_night="111000"
+color_bg_night="000000"
 
 bcastip="192.168.174.255"
 
