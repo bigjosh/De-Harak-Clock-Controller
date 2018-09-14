@@ -164,8 +164,8 @@ int main( int argc, char **argv) {
 	
 	printf("LEDs (c)2016 josh levine [josh.com]\r\n");
     
-    if (argc!=7) {
-            fprintf(stderr,"Usage  : leds dest_ip  rgb left right top bot \r\n");
+    if (argc<7) {
+            fprintf(stderr,"Usage  : leds dest_ip  rgb left right top bot [col] [row]\r\n");
             fprintf(stderr,"         RGB color format XXXXXX (FFFFFF=white)\r\n");
             
             fprintf(stderr,"Example: leds 192.168.174.2 0000FF 0 %d  0 %d  = Full panel to blue\r\n", SIZE_X , SIZE_Y );
@@ -196,19 +196,41 @@ int main( int argc, char **argv) {
 	unsigned char right 	= atoi( argv[4] );	
 	unsigned char top 		= atoi( argv[5] );	
 	unsigned char bottom 	= atoi( argv[6] );	
-        
+	
+	unsigned char col = SIZE_X;
+	
+	if (argc>7) {
+		
+		col = atoi( argv[7] );
+	}
+
+	unsigned char row = SIZE_Y;
+	
+	if (argc>8) {
+		
+		row = atoi( argv[8] );
+	}
+	
+	
+	
+
+
     printf("l=%d r=%d t=%d b=%d\r\n",left,right,top,bottom);
 		
    for( int x=left; x< MIN(SIZE_X , right)  ; x++) {
-        
+       	   
+      if ( (col >= SIZE_X ) || ( x == col ) ) {
+             	   	   
         for(int y=top;y<= MIN(SIZE_Y, bottom) ;y++) {
-            
-            r[x][y] = r1;
-            g[x][y] = g1;
-            b[x][y] = b1;
-            
+ 	     if ( (row >= SIZE_Y ) || ( y == row ) ) {
+                       
+            	r[x][y] = r1;
+            	g[x][y] = g1;
+            	b[x][y] = b1;
+	    }
             
         }
+      }
     }
     
     sendOPCPixels();
