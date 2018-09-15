@@ -78,6 +78,18 @@ do
                  pkill -P $$                 
                  ./sinebow.sh > /dev/null &  
                  ;;                                
+            "vstripe"*) 
+                 echo "Got Vstripe" 
+                 # kill any running child process
+                 pkill -P $$                 
+                 ./vstripe.sh > /dev/null &  
+                 ;;                                
+            "hstripe"*) 
+                 echo "Got hstripe" 
+                 # kill any running child process
+                 pkill -P $$                 
+                 ./hstripe.sh > /dev/null &  
+                 ;;                                
                  
             *)
                 echo "Unknown request"

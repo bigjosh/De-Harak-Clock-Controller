@@ -27,8 +27,7 @@ while true; do
 
 
 
-
-		for row in {0..24}; do
+		for row in {0..25}; do
 
 
 

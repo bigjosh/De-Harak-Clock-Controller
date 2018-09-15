@@ -1,0 +1,6 @@
+#!/bin/sh
+# called from chrontab
+# so sad we have to do this, btut the wlan just dies sometime and 
+
+ifdown wlan0
+ifup wlan0

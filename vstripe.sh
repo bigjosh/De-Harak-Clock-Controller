@@ -9,16 +9,16 @@
 
 while true; do  
 
-	for color in "3f0000" "003f00" "00003f"; do
+	for color in "8f0000" "008f00" "00008f"; do
 
 
 
-		for col in {0..59}; do
+		for col in {0..58}; do
 
 
                 ./udpopc 192.168.174.255 $color 0 59 0 25 $col
 
-          sleep 0.25                           
+          sleep 0.1                           
 
 		done 
 
