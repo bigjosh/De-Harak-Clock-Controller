@@ -1,13 +1,13 @@
 #!/bin/bash
 # This is the actual clock! Put the digits up every second. Make sure local clock has right time.
 
-color_red="400000"
-color_blue="000040"
+color_red="800000"
+color_blue="000070"
 color_white="303030"
-color_green="0060040"
+color_green="0060070"
 
 color_bg_day="000000"
-color_bg_night="000000"
+color_bg_night="202020"
 
 bcastip="192.168.174.255"
 
@@ -161,7 +161,7 @@ while true; do
     
     # off btween 3AM and 8PM
         
-    if (( $h24 > 3 )) && (( $h24 < 20 )); then     
+    if (( $h24 > 4 )) && (( $h24 < 18 )); then     
         color_bg=$color_bg_day
     else
         color_bg=$color_bg_night

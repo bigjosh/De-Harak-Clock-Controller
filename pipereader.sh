@@ -41,7 +41,7 @@ fi
 #let everyone use it
 chmod a+rw $pipe
 
-ehco Starting clock mode
+echo Starting clock mode
 ./clockmode.sh &
 
 while true
@@ -90,7 +90,11 @@ do
                  pkill -P $$                 
                  ./hstripe.sh > /dev/null &  
                  ;;                                
-                 
+            "stop"*) 
+                 echo "Got stop" 
+                 # kill any running child process
+                 pkill -P $$
+		 ;;              
             *)
                 echo "Unknown request"
                 ;;
