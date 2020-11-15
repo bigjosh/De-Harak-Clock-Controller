@@ -18,7 +18,7 @@ This repo contains the master controller software.  It runs on a Raspberry Pi us
 
 The controller is accessable via ssh and also publishes a web page where you can run demo displays and check some diagnostics. 
 
-!(web controller)[web-photo.png]
+![web controller](web-photo.png)
 
 # Digits 
 
