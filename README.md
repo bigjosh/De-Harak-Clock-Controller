@@ -298,6 +298,12 @@ cd bbbphyfix/
 sync
 ```
 
+It is also a good idea to remove `wicd` since there is no wifi on these boards and it eats CPU time...
+
+```
+apt-get remove wicd*
+``` 
+
 ## Remotely from the master controller
 
 Install the bbbphy fix remotely.Note you must have installed [pushphyfix](https://github.com/bigjosh/pushphyfix) on the controller...
