@@ -1,6 +1,20 @@
 # De Harrak Clock Controller Software
 
-This software runs on a Raspberry Pi and controls 72 independent digit panels attached to the same network as the Pi. 
+This is the software that runs the Rudolph de Harak digital clock on the side of [200 Water Street](https://www.google.com/maps/place/Rudolph+de+Harak+Digital+Clock/@40.7071539,-74.0049962,15z/data=!4m5!3m4!1s0x0:0x4026e66ed3e9df81!8m2!3d40.7071539!4d-74.0049962) in New York. 
+
+![clock](clock-photo.jpg)
+
+# History
+
+The clock was orginally installed in 1971. Each digit contained a set of florecent bulbs, some with colored gels. There was a very large relay-based controller that occupied the space that is now Starbucks. 
+
+![bulbs]bulbs-photo.jpg)
+
+Unfortunately this setup proved to be very dificult to maintain so in 2015 Rockrose (the owner) upgraded the clock to use modern LED fixures controlled by a tiny digital computer.
+
+# Controller software 
+
+This repo contains the software that controls the clock. It runs on a Raspberry Pi and controls the 72 independent digit panels using UDP packets. The digit panels and the Pi are all attached to a common local 10Base100 network with Cat5 home runs going between each digit and the control center. The bunde of network cables runs over the roof of the adjoining resturant. 
 
 Each digit panel is running the [LEDscape package](https://github.com/bigjosh/LEDscape) to drive the attached LEDs.
 
