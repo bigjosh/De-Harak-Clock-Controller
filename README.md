@@ -8,7 +8,7 @@ This is the software that runs the Rudolph de Harak digital clock on the side of
 
 The clock was orginally installed in 1971. Each digit contained a set of florecent bulbs, some with colored gels. There was a very large relay-based controller that occupied the space that is now Starbucks. 
 
-!([bulbs]bulbs-photo.jpg)
+![bulbs](bulbs-photo.jpg)
 
 Unfortunately this setup proved to be very dificult to maintain so in 2015 Rockrose (the owner) upgraded the clock to use modern LED fixures controlled by a tiny digital computer.
 
