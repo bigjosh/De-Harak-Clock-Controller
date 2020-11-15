@@ -8,19 +8,25 @@ This is the software that runs the Rudolph de Harak digital clock on the side of
 
 The clock was orginally installed in 1971. Each digit contained a set of florecent bulbs, some with colored gels. There was a very large relay-based controller that occupied the space that is now Starbucks. 
 
-![bulbs]bulbs-photo.jpg)
+!([bulbs]bulbs-photo.jpg)
 
 Unfortunately this setup proved to be very dificult to maintain so in 2015 Rockrose (the owner) upgraded the clock to use modern LED fixures controlled by a tiny digital computer.
 
 # Controller software 
 
-This repo contains the software that controls the clock. It runs on a Raspberry Pi and controls the 72 independent digit panels using UDP packets. The digit panels and the Pi are all attached to a common local 10Base100 network with Cat5 home runs going between each digit and the control center. The bunde of network cables runs over the roof of the adjoining resturant. 
+This repo contains the master controller software.  It runs on a Raspberry Pi using the Raspberrian Linux distro. It controls the 72 independent digit panels using Open Pixel Server formated UDP packets.
 
-Each digit panel is running the [LEDscape package](https://github.com/bigjosh/LEDscape) to drive the attached LEDs.
+The controller is accessable via ssh and also publishes a web page where you can run demo displays and check some diagnostics. 
+
+!(web controller)[web-photo.png]
+
+# Digits 
+
+Each digit panel contains a BeagleBone Black computer running the [LEDscape package](https://github.com/bigjosh/LEDscape) to drive the attached LEDs.
 
 The master controller uses DNSMASQ to hand out IP addresses and maps those addresses to digits by MAC address using DNS entries in the `dhcp-hosts` file.
 
-Each panel gets a DNS name that is mapped to its location on the clock. The top row of digits are `T01` - `T12`, and the bottom 5 rows are `B00` - `B59`.
+Each panel gets a DNS name that is mapped to its location on the clock. The top row of digits are `H01` - `H12`, and the bottom 5 rows are `M00` - `M59`.
 
 # Operation
 
@@ -42,7 +48,7 @@ All of the wiring and controls are in the closet behind the front desk at 200 Wa
 
 The breaker panel controls power to the clock. Each breaker controls several columns, which are labeled in sharpie. 
 
-These are AFCI breakers, so they can half trip anytime there is a ground current detected. In this case, they need to be switched off and then on again to reset. 
+These are AFCI breakers, so they can half trip anytime there is a ground current detected. In this case, they need to be switched off and then on again to reset. If an AFCI breaker trips repeatedly, it like means that either there is water getting into the panels or outside conduit, or that the breaker needs to be replaced. 
 
 There is a master relay to the left of the panel that turns off all circuits. There is a control switch for the master breaker outside on the bottom right of the clock itself...
 
@@ -52,7 +58,9 @@ THIS SWITCH IS WATER DAMAGED AND SWITCHES UNPREDICABLY. It is therefore importan
 
 ## Network
 
-A single CAT5 network cable comes in from each digit box to the patch panel. There is then a patch cable that connects that digit to one of the switches. The switches are configured to run at 10Mbs/half. 
+A single CAT5 network cable comes in from each digit box to the patch panel in the control room. These cables run in a bundle over theroof of the adjacent resturant. 
+
+There is a patch cable that connects each digit to one of the two switches. The Raspberry Pi master controller is connected to one of the switches. The switches are configured to run at 10Mbs/half. 
 
 The raspberrypi also uses Wifi to connect out to the internet through an access point under the front desk in the lobby. 
 
@@ -63,13 +71,6 @@ This internet connection is used to...
 1. Keep the clock synced to the correct time and adjust for DST
 2. Provide the web-based demo control page using a Dataplicity wormhole. The page is served by a local Apache running on the pi.
 3. Allow remote SSH connections via both Dataplicity and R3motiT. 
-
-
-## Controller
-
-The controller is a Raspberri Pi computer running Raspberian Linux and the software in this repo. 
-
-The controller also connected to the switches and also has a Wifi connection to the internet via the Timer Warner Access point in the lobby. This internet connect is used to keep the local time accurate via NTP, and also provides remote access. 
 
 # Troubleshooting
 
