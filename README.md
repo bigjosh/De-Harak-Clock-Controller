@@ -291,10 +291,13 @@ ssh -l root m20
 Instructions to build new digit panels...
 https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
 
-Then flash the LEDscape image on to the Beaglebone...
-https://github.com/bigjosh/LEDscape/releases/tag/1.0
+Then flash the LEDscape image on to the Beaglebone by putting an SD card with this image in it...
+https://github.com/bigjosh/LEDscape/releases/tag/1.1
+...and holding the USR button (near SD slot) at power up until you see cylon LED pattern. 
 
-Once you've check the spiral pattern, we need to get the digit ready for the clock by killing the spiral test pattern and installing the `bbbphyfix`. 
+At power up, the board should go into `redbeat` pattern where it flashes red 1 second per minute. 
+
+To check the LED layout is correct, send something like a bullseye pattern from a controller. 
 
 ## If you are on the BBB
 
@@ -303,38 +306,34 @@ sudo systemctl disable /root/DigitPanelDemo/ledsd.service
 sudo killall leds
 ```
 
-```
-rm -r bbbphyfix/
-git clone https://github.com/bigjosh/bbbphyfix
-cd bbbphyfix/
-./install
-sync
-```
 
-It is also a good idea to remove `wicd` since there is no wifi on these boards and it eats CPU time...
+Steps to make a BBB into a controller if you don't want to use the premade image above
 
-```
-apt-get remove wicd*
-``` 
+1. Start with installing Debian 7.11 2015-06-15 4GB SD LXDE. http://beagleboard.org/getting-started
+2. Install `Ledscape` https://github.com/bigjosh/LEDscape#installation
+3. Install `bbbphyfix` https://github.com/bigjosh/bbbphyfix#install
+4. Install `devmemkb` https://github.com/bigjosh/devmemkm#installation
+5. Optionally remove `wicd`...
+    1. `apt-get remove wicd*`
+    2. `nano /etc/network/interfaces`
+    3. Uncomment these two lines...
+        1. `auto eth0`
+        2. `iface eth0 inet dhcp`
+6. `sync`
 
-## Remotely from the master controller
+## If make a new SD flasher with the current system state
 
-Install the bbbphy fix remotely.Note you must have installed [pushphyfix](https://github.com/bigjosh/pushphyfix) on the controller...
+1. Put in 4Gb SD card
+2. `sudo /opt/scripts/tools/eMMC/beaglebone-black-make-microSD-flasher-from-eMMC.sh`
+3. `nano /boot/uEnv.txt`
+4. Uncomment the flasher line `cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh`
 
-`./push.sh h06`
-
-...where `h06` is the hostname or IP address of the digit like `h01` or `m45`.
-
-Disable the spiral demo...
+## To run a command remotely from the master controller
 
 ```
 ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl disable /root/DigitPanelDemo/ledsd.service
 ssh root@h01 -oStrictHostKeyChecking=no sudo killall leds
 ```
-
-... where `h01` is the digit. 
-
-Then assign the digit to the clock using the `digitpicker.sh` script. 
 
 # Logs
 A chon takes a log snapshot of all working digits every minute using `checkdigitsl.sh `. They are in `/home/pi/logs/`.
