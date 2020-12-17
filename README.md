@@ -319,6 +319,8 @@ Steps to make a BBB into a controller if you don't want to use the premade image
     3. Uncomment these two lines...
         1. `auto eth0`
         2. `iface eth0 inet dhcp`
+6. Install `ledscape-config.json` with...
+    1. `wget --directory-prefix=/etc/ https://raw.githubusercontent.com/bigjosh/De-Harak-Clock-Controller/master/bbb/ledscape-config.json` 
 6. `sync`
 
 ## If make a new SD flasher with the current system state
