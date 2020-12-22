@@ -82,9 +82,13 @@ Likely a blown breaker, probably after rain. Find the corresponding breaker on t
 
 First try reseting the whole column using the Breaker Reset procedure below. If that does not work, then the panel is likely damaged and needs to be replaced with a spare. Sorry.
 
-## Whole clock showing slow rainbow error pattern
+## Whole clock showing showing red pulse once per minute
 
-There was either a power failure or the controller is unplugged. 
+THis indicates that the digit panels are not getting updated packets from the controller. This could be due to...
+
+1. a power failure
+2. the controller is unplugged or not running 
+3. a network connectivity problem between the controller and the rest of the clock. 
 
 Try running the startup procedure below. If you are not able to access the controller to run the procedure, check to see if it has power and is connected to the network. 
 
