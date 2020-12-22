@@ -1,2 +1,0 @@
-nohup: missing operand
-Try 'nohup --help' for more information.

@@ -29,5 +29,5 @@
 
 # log the working digit scan every minute to a daily file
 
-*   * * * * /home/pi/clock-controller/checkdigitsl.sh >> /home/pi/logs/`date +\%Y\%m\%d`.log
+*   * * * * /home/pi/clock-controller/checkdigitsl.sh >> /home/pi/logs/`date +\%4Y\%2m\%2d`.log
 
