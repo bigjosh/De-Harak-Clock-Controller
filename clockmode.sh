@@ -7,8 +7,8 @@ color_white="303030"
 color_green="0060070"
 
 color_bg_day="000000"
-color_bg_night="202020"
-
+color_bg_night="000000"
+5
 bcastip="192.168.174.255"
 
 #clear board
