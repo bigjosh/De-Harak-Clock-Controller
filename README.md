@@ -89,9 +89,10 @@ There was either a power failure or the controller is unplugged.
 Try running the startup procedure below. If you are not able to access the controller to run the procedure, check to see if it has power and is connected to the network. 
 
 
-## Individual Digit(s) showing slow rainbow error pattern
+## Individual Digit(s) showing red pulse once per minute
 
-This pattern indicates that the digit has lost its network connection with the controller. 
+This pattern indicates that the digit hasis not getting any updated packets (OPC) from the controller. This can either indicate that 
+the controller is not sending packets becuase no effect is running, or that the panel has lost its network connection to the controller. 
 
 Check the entire network path from the swicth to the digit. 
 
