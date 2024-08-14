@@ -312,13 +312,13 @@ sudo killall leds
 ```
 
 
-Steps to make a BBB into a controller if you don't want to use the premade image above
+Steps to make a BBB into a controller if you don't want to use the premade image above, here are steps to create it..
 
 1. Start with installing Debian 7.11 2015-06-15 4GB SD LXDE. http://beagleboard.org/getting-started
 2. Install `Ledscape` https://github.com/bigjosh/LEDscape#installation
 3. Install `bbbphyfix` https://github.com/bigjosh/bbbphyfix#install
 4. Install `devmemkb` https://github.com/bigjosh/devmemkm#installation
-5. Optionally remove `wicd`...
+5. Remove `wicd`...
     1. `apt-get remove wicd*`
     2. `nano /etc/network/interfaces`
     3. Uncomment these two lines...
@@ -327,6 +327,8 @@ Steps to make a BBB into a controller if you don't want to use the premade image
 6. Install `ledscape-config.json` with...
     1. `wget --directory-prefix=/etc/ https://raw.githubusercontent.com/bigjosh/De-Harak-Clock-Controller/master/bbb/ledscape-config.json` 
 6. `sync`
+
+Note that we remove `wicd` since it uses lots of CPU when idle and this increases the chances of the ARM having memory contention when the PRUs go to access the GPIO pins, which causes white flashes. 
 
 ## If make a new SD flasher with the current system state
 
