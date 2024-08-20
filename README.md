@@ -297,7 +297,7 @@ Instructions to build new digit panels...
 https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
 
 Instructions to set up the BBB software...
-[bbb-software.md](bbb-software.md)
+[bbb-setup.md](bbb-setup.md)
 
 ## To run a command remotely on a digit from the master controller
 
