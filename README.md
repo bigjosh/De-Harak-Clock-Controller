@@ -296,48 +296,10 @@ ssh -l root m20
 Instructions to build new digit panels...
 https://www.instructables.com/id/Massive-Neopixel-WS2812B-Display-Panels/
 
-Then flash the LEDscape image on to the Beaglebone by putting an SD card with this image in it...
-https://github.com/bigjosh/LEDscape/releases/tag/1.1
-...and holding the USR button (near SD slot) at power up until you see cylon LED pattern. 
+Instructions to set up the BBB software...
+[bbb-software.md](bbb-software.md)
 
-At power up, the board should go into `redbeat` pattern where it flashes red 1 second per minute. 
-
-To check the LED layout is correct, send something like a bullseye pattern from a controller. 
-
-## If you are on the BBB
-
-```
-sudo systemctl disable /root/DigitPanelDemo/ledsd.service
-sudo killall leds
-```
-
-
-Steps to make a BBB into a controller if you don't want to use the premade image above, here are steps to create it..
-
-1. Start with installing Debian 7.11 2015-06-15 4GB SD LXDE. http://beagleboard.org/getting-started
-2. Install `Ledscape` https://github.com/bigjosh/LEDscape#installation
-3. Install `bbbphyfix` https://github.com/bigjosh/bbbphyfix#install
-4. Install `devmemkb` https://github.com/bigjosh/devmemkm#installation
-5. Remove `wicd`...
-    1. `apt-get remove wicd*`
-    2. `nano /etc/network/interfaces`
-    3. Uncomment these two lines...
-        1. `auto eth0`
-        2. `iface eth0 inet dhcp`
-6. Install `ledscape-config.json` with...
-    1. `wget --directory-prefix=/etc/ https://raw.githubusercontent.com/bigjosh/De-Harak-Clock-Controller/master/bbb/ledscape-config.json` 
-6. `sync`
-
-Note that we remove `wicd` since it uses lots of CPU when idle and this increases the chances of the ARM having memory contention when the PRUs go to access the GPIO pins, which causes white flashes. 
-
-## If make a new SD flasher with the current system state
-
-1. Put in 4Gb SD card
-2. `sudo /opt/scripts/tools/eMMC/beaglebone-black-make-microSD-flasher-from-eMMC.sh`
-3. `nano /boot/uEnv.txt`
-4. Uncomment the flasher line `cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh`
-
-## To run a command remotely from the master controller
+## To run a command remotely on a digit from the master controller
 
 ```
 ssh root@h01 -oStrictHostKeyChecking=no sudo systemctl disable /root/DigitPanelDemo/ledsd.service
