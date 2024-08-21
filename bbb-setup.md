@@ -30,6 +30,7 @@ Steps to make a BBB into a controller if you don't want to use the premade image
    ```
    apt-get remove apache2
    apt-get remove chromium-browser-l10n
+   apt-get remove xserve*   
    apt-get autoremove
    ```   
 6. Install `ledscape-config.json` with (note we need the no-certificate becuase this debian is so old that it does not get cert updates anymore)...
