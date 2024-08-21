@@ -20,7 +20,7 @@ Steps to make a BBB into a controller if you don't want to use the premade image
 3. Install `bbbphyfix` https://github.com/bigjosh/bbbphyfix#install
 4. Install `devmemkb` https://github.com/bigjosh/devmemkm#installation
 5. Remove `wicd`...
-    3. `nano /etc/network/interfaces`
+    1. `nano /etc/network/interfaces`
     4. Uncomment these two lines...
         1. `auto eth0`
         2. `iface eth0 inet dhcp`
