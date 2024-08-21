@@ -33,7 +33,7 @@ Steps to make a BBB into a controller if you don't want to use the premade image
    apt-get autoremove
    ```   
 6. Install `ledscape-config.json` with (note we need the no-certificate becuase this debian is so old that it does not get cert updates anymore)...
-    2. `wget --directory-prefix=/etc/ --no-check-certificate https://raw.githubusercontent.com/bigjosh/De-Harak-Clock-Controller/master/bbb/ledscape-config.json`
+    2. `wget -O /etc/ledscape-config.json --no-check-certificate https://raw.githubusercontent.com/bigjosh/De-Harak-Clock-Controller/master/bbb/ledscape-config.json`
 6. `sync`
 
 Note that we remove `wicd` since it uses lots of CPU when idle and this increases the chances of the ARM having memory contention when the PRUs go to access the GPIO pins, which causes white flashes. 
