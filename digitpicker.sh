@@ -14,134 +14,144 @@
 
 #read leases file line by line and make an associative array of mac:name
 
+
+#!/bin/bash
+
+# Declare associative array
 declare -A names
-declare -A addresses
+declare -A ips
+# Declare non-associative array to keep sorted order
+declare -a macs
 
-while read p
-do
+# Sort the file and process each line
+while IFS=' ' read -r timestamp mac ip name _; do
+    # Skip empty lines
+    [ -z "$ip" ] && continue
 
-#	echo "Line=$p"
+    # Assign values to arrays
 
-    read -ra arr <<<"$p"
+    #macs is a non-associative array so keeps order
+    macs+=("$mac")
+    names[$mac]="$name"
+    ips[$mac]=$ip
 
-#	echo "0=${arr[0]} 1=${arr[1]}"
+done < <(sort -k4 /var/lib/misc/dnsmasq.leases)
+
+# Print the results (optional)
+
+echo -e "MAC:NAME:"
+for mac in "${macs[@]}"; do
+    echo "$mac: ${names[$mac]}"
+done
 
 
-	# name is 3rd thing on leases file line (IP is second)
-    names[${arr[1]}]="${arr[3]}"
-
-    addresses[${arr[1]}]="${arr[2]}"
-
-
-
-done </var/lib/misc/dnsmasq.leases
-
-# all active machines now loaded in arr
+# all active machines now loaded in arrays
 
 finished=false
 
 #start with first item selected
-current=${names[0]}
+current=${macs[0]}
 
 while [ "$finished" = false ] ; do
 
-	#build the command line for the menu from the ass array
+        #build the command line for the menu from the ass array
 
-	i=0
+        i=0
 
-	# loop though keys
-	
-	for K in "${!names[@]}"; do 
+        # loop though keys
 
-	    menu[i]="$K"
-	    menu[i+1]="${names[$K]}"
-	    ((i+=2))
+        for mac in "${macs[@]}"; do 
 
-	done
+            #tag
+            menu[i]="$mac"
 
-	# DNS Name second
+            #display
+            menu[i+1]="${names[$mac]}"
+            ((i+=2))
 
-	mac=$(
-		whiptail --default-item "$current" --menu "Pick an address" --ok-button "Blink (enter)" --cancel-button "Save" 24 60 18 "${menu[@]}" 3>&2 2>&1 1>&3
-	)
+        done
 
-	response=$?
+        # DNS Name second
 
-	if (( $response == 0 )); then
+        mac=$(
+                whiptail --default-item "$current" --menu "Pick an address" --ok-button "Blink (enter)" --cancel-button "Save" 24 60 18 "${menu[@]}" 3>&2 2>&1 1>&3
+        )
 
-			# they picked a line, lets figure out which one
+        response=$?
 
-			address="${addresses[$mac]}"
+        if (( $response == 0 )); then
 
+                        # they picked a line, lets figure out which one
 
-			#broadcast to turn off all
-			./udpopc 192.168.174.255 000020 0 59 0 25
+                        address="${ips[$mac]}"
 
-			#blink  selected digit
-			./udpopc $address 800000 0 59 0 25
-			sleep 0.1
+                        #broadcast to turn off all
+                        ./udpopc 192.168.174.255 000020 0 59 0 25
 
-			./udpopc $address 008000 0 59 0 25
-			sleep 0.1
+                        #blink  selected digit
+                        ./udpopc $address 800000 0 59 0 25
+                        sleep 0.1
 
-			./udpopc $address 800000 0 59 0 25
-			sleep 0.1
+                        ./udpopc $address 008000 0 59 0 25
+                        sleep 0.1
 
-			name="${names[$mac]}"
+                        ./udpopc $address 800000 0 59 0 25
+                        sleep 0.1
 
-			newname=$(
-				whiptail --inputbox --ok-button "Ok (enter)" --cancel-button "Cancel (esc)" "New name for $name" 8 60  3>&2 2>&1 1>&3
-			)
+                        name="${names[$mac]}"
 
-			if [[ ! -z "$newname" ]]; then
+                        newname=$(
+                                whiptail --inputbox --ok-button "Ok (enter)" --cancel-button "Cancel (esc)" "New name for $name" 8 40  3>&2 2>&1 1>&3
+                        )
 
-				names[$mac]="$newname"
+                        if [[ ! -z "$newname" ]]; then
 
-			fi
+                                names[$mac]="$newname"
 
-			current=$mac
+                        fi
 
-	elif (( $response == 1 )); then
+                        current=$mac
 
-		# save 
+        elif (( $response == 1 )); then
 
-		echo "Saving to /etc/dhcp-hostsfile.conf..."
+                # save 
 
-		tmpfile=$(mktemp /tmp/digitpicker.XXXXXX)
+                echo "Saving to /etc/dhcp-hostsfile.conf..."
 
-		# loop though keys and create entries in host file
-	
-		for K in "${!names[@]}"; do 
+                tmpfile=$(mktemp /tmp/digitpicker.XXXXXX)
 
-			echo "$K,${names[$K]}" >>"$tmpfile"
+                # loop though keys and create entries in host file
 
-		done		
+                for mac in "${macs[@]}"; do 
 
-		echo "New Host file created." 
+                        echo "$mac,${names[$mac]}" >>"$tmpfile"
 
-		#overwrite old file
+                done
 
-		sudo cp "$tmpfile" /etc/dhcp-hostsfile.conf
+                echo "New Host file created." 
 
-		rm "$tmpfile"
+                #overwrite old file
 
+                sudo cp "$tmpfile" /etc/dhcp-hostsfile.conf
 
-		echo "Host file updated." 
+                echo "Host file updated." 
 
-		finished=true
+                rm "$tmpfile"
 
-	elif (( $response == 255 )); then
+                finished=true
 
-		whiptail --yesno "Quit without saving?" 8 40 
+        elif (( $response == 255 )); then
 
-		if [ $? -eq 0 ]; then
+                whiptail --yesno "Quit without saving?" 8 40 
 
-			echo "Quiting without saving...."
-			finished=true
+                if [ $? -eq 0 ]; then
 
-		fi
+                        echo "Quiting without saving...."
+                        finished=true
 
-	fi
+                fi
+
+        fi
 
 
 done
