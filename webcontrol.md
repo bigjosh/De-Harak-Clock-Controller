@@ -4,12 +4,19 @@ The Pi serves static pages through Apache and runs CGI scripts as `www-data`.
 The normal `control.html` page sends animation commands through `light.cgi` to
 `/tmp/clockcommands`, which the existing `pipereader.sh` service consumes.
 
-Install Apache and enable CGI if this Pi does not already have the web controls:
+For the DLD deployment page, use the [GitHub installer](#one-time-setup-on-the-pi)
+below; it handles missing packages and chooses the CGI module. To set up the
+older control pages manually, install Apache and enable CGI for its current MPM:
 
 ```sh
 sudo apt-get install apache2 python3 openssh-client
-sudo a2enmod cgi
-sudo systemctl restart apache2
+if sudo apache2ctl -M 2>/dev/null | grep -q mpm_prefork_module; then
+  sudo a2enmod cgi
+else
+  sudo a2enmod cgid
+fi
+sudo apache2ctl configtest
+sudo systemctl reload apache2
 ```
 
 After changing web files, run this from the controller checkout:
@@ -18,9 +25,10 @@ After changing web files, run this from the controller checkout:
 sh webcontrol/install.sh
 ```
 
-The installer copies static files into `/var/www/html`, installs executable
+This full-web installer copies static files into `/var/www/html`, installs executable
 CGI scripts into `/usr/lib/cgi-bin`, and reloads Apache. It also works when
-invoked by an absolute path from another directory.
+invoked by an absolute path from another directory. It can replace existing
+control files; the DLD installers use its `--dld-only` mode to preserve them.
 
 ## Trial deployment of DLD
 
@@ -159,7 +167,8 @@ The CGI launches the installed DLD `tools/deploy-trial-digit.sh` with exactly
 one validated digit name. That shared wrapper owns the name-to-index mapping:
 `h01=0`, `h12=11`, `m00=12`, `m34=46`, and `m59=71`.
 
-The DLD launcher imports the target's LEDscape strip lengths and color order,
+The DLD launcher imports strip lengths and color order from the target's
+`/etc/ledscape-config.json`,
 sets the FFS index, uploads the bundle into a fresh BBG `/run` directory,
 validates it, stops the old LEDscape or DLD process, initializes the driver,
 and starts its UDP receiver. The controller's running clock/animation process
@@ -169,6 +178,33 @@ The handover remains a trial: the target's persistent LEDscape files and boot
 setup are preserved. A target reboot restores its existing boot behavior.
 The browser reports command failure and retains the console output; it does
 not report a successful deployment simply because the job was accepted.
+
+### Input protocols and indicators
+
+Both inputs run at the same time on each deployed BBG:
+
+| Input | UDP port | Panel color |
+| --- | --- | --- |
+| Existing OPC packets | 7890 | First RGB pixel, repeated uniformly across every enabled string |
+| Full Frame Snapshot (FFS) | 6565 | RGB value at the panel's `ffs_index` in a 216-byte packet |
+
+An FFS packet contains exactly 72 consecutive three-byte RGB values, with no
+header. Send it by broadcast on the clock's subnet. The values follow the
+display from left to right, top to bottom: `H01`–`H12`, then `M00`–`M59`.
+Whichever valid packet the receiver reads last supplies the color, regardless
+of protocol. FFS is disabled when `ffs_index` is absent; named-digit deployment
+always sets it. The existing Pi clock scripts keep sending OPC during a trial.
+
+The OPC shim provides one color for the whole panel. It does not reproduce
+spatial images or animations within a panel from the remaining packet pixels.
+
+The web launcher uses the receiver's default indicators: one green smooth flash
+at startup and a red smooth flash after a minute without an accepted color
+packet or another idle flash. Each flash ramps up for 0.5 seconds and back down
+for 0.5 seconds. Accepted color input interrupts either flash at the next frame,
+so the startup flash may be cut short while the clock is already streaming.
+Repeated red flashes indicate missing accepted input. The command-line digit wrapper
+offers `--no-startup-flash` and `--no-idle-flash`; the browser uses the defaults.
 
 ### Update or troubleshoot
 
@@ -228,3 +264,8 @@ python3 webcontrol/tests/test_install_from_github.py
 python3 webcontrol/tests/test_install_web.py
 python3 webcontrol/tests/test_package_dld_runtime.py
 ```
+
+The packaging helper and its tests need Python 3.8+. The shell installer tests
+use `/bin/sh` on Linux or Git for Windows' shell on Windows. These checks cover
+download validation, selective installation, package integrity, and deployment
+job handling; physical waveform qualification is documented in the DLD repository.

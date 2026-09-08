@@ -14,17 +14,25 @@ Unfortunately this setup proved to be very dificult to maintain so in 2015 Rockr
 
 # Controller software 
 
-This repo contains the master controller software.  It runs on a Raspberry Pi using the Raspberrian Linux distro. It controls the 72 independent digit panels using Open Pixel Server formated UDP packets.
+This repo contains the master controller software. It runs on a Raspberry Pi and controls the 72 independent digit panels using Open Pixel Control (OPC) packets over UDP.
 
-The controller is accessable via ssh and also publishes a web page where you can run demo displays and check some diagnostics. 
+The controller is accessible through SSH and publishes a web page where you can run demo displays and check diagnostics. See [Web controls](webcontrol.md) for Apache setup and operation.
+
+## Trial the new DLD driver
+
+The separate **`/deploy.html`** page displays the clock's 12-column, 6-row grid. Click a digit to install the DLD trial on that BBG and follow its console output in the browser. It is deliberately unlinked from the normal control pages and has no login; anyone who knows the URL can use it.
+
+Use the [GitHub installer](webcontrol.md#one-time-setup-on-the-pi) to add the page and its complete, verified DLD runtime to an existing Pi. No pre-staged gateway, compilation, or separate DLD release is needed. Installing the page preserves the normal controls and does not deploy to any panel until one is selected.
+
+Each deployment imports the target's LEDscape configuration, derives its FFS index from the digit name, and stages DLD in the BBG's `/run` directory. The clock's existing OPC traffic continues during the handover. **A BBG reboot restores its existing LEDscape boot behavior.** See the [deployment procedure and troubleshooting](webcontrol.md#what-a-click-does) for details.
 
 # Digits 
 
-Each digit panel contains a BeagleBone Black computer running the [LEDscape package](https://github.com/bigjosh/LEDscape) to drive the attached LEDs.
+Each digit panel contains a BeagleBone Black/Green computer. Its existing boot setup runs [LEDscape](https://github.com/bigjosh/LEDscape); the optional [DLD replacement](https://github.com/bigjosh/deharrak-leds-driver) can take over temporarily without replacing that boot setup. The bundled DLD runtime requires an ARMv7 BBG running Linux `3.8.13-bone80`.
 
 The master controller uses DNSMASQ to hand out IP addresses and maps those addresses to digits by MAC address using DNS entries in the `dhcp-hosts` file.
 
-Each panel gets a DNS name that is mapped to its location on the clock. The top row of digits are `H01` - `H12`, and the bottom 5 rows are `M00` - `M59`.
+Each panel gets a DNS name that is mapped to its location on the clock. The top row is `H01`–`H12`. The minute rows are `M00`–`M11`, `M12`–`M23`, `M24`–`M35`, `M36`–`M47`, and `M48`–`M59`, all left to right. DLD's Full Frame Snapshot (FFS) indices follow that same order: `H01=0`, `H12=11`, `M00=12`, and `M59=71`.
 
 # Operation
 
@@ -32,7 +40,7 @@ The clock runs continuously using the local linux time. The local time is discip
 
 In the case when minutes and seconds are on the same digit, seconds win. 
 
-The background is currently set to turn on at 8PM and off at 7AM. This saves a bit of power and wear as the dim background light is not visible during daylight. This is set at the top of the `clockmode.sh` script. 
+The checked-in `clockmode.sh` selects the dim background from 6PM until 5AM, using its `America/New_York` hour. Outside those hours it selects the daytime background, currently black. The colors and hour condition are defined in that script; the installed Pi may have local adjustments.
 
 # Layout
 
@@ -84,6 +92,8 @@ First try reseting the whole column using the Breaker Reset procedure below. If 
 
 ## Whole clock showing slow rainbow error pattern
 
+This symptom describes LEDscape. A panel running a DLD trial instead shows a smooth red idle flash after a minute without accepted color packets; see [DLD indicators](webcontrol.md#input-protocols-and-indicators).
+
 There was either a power failure or the controller is unplugged. 
 
 Try running the startup procedure below. If you are not able to access the controller to run the procedure, check to see if it has power and is connected to the network. 
@@ -117,10 +127,10 @@ The controller lost its connection to the internet. Try rebooting the Timer Warn
 There is a `chon` job that runs `midnight.sh` every night at midnight and restarts the `clockmode.sh` script every night...
 
 ```
-00 00 * * * /home/pi/De-Harak-Clock-Controller/midnight.sh
+00 00 * * * /home/pi/clock-controller/midnight.sh
 ``` 
 
-Use `crontab -e` if you ever need to edit or re-add this line. 
+Use `crontab -e` if you ever need to edit or re-add this line. Adjust the checkout path to match the Pi; [crontab.txt](crontab.txt) contains the example schedule.
 
 # Digit Health Logging 
 
@@ -166,11 +176,15 @@ This log format is helpful to see what happened if several digits have problems 
 
 # Installation
 
+For the DLD deployment page on an already-running Pi, use the [GitHub installer](webcontrol.md#one-time-setup-on-the-pi). The older full-controller and SD-card procedures below concern the clock itself; they are not required to add or update the deployment page.
+
 Easiest way to install is to use the release in this repo to flash a new SD card. Then `cd` into the repo and do a `git pull` to make sure everything is up to date.
 
 Use `tzselect` to set the right timezone if necessary.
 
 ## Manual install
+
+These are the historical full-controller setup steps. The current `leds.c` canvas experiment is unfinished, so this is not a validated rebuild procedure for the current branch. The DLD web installer uses its packaged runtime and does not build these sources.
 
 Clone this repo into `/home/pi/clock-controller`
 
@@ -208,24 +222,24 @@ There are lots of demos and test patterns available.
 
 Each has a command that the pipereader should know. Look in `pipereader.sh` for a list.
 
-For example, to start the sinbowwave pattern (a sinbow is a rainbow by with sine shaped color curves), you'd enter...
+For example, to start the sinebow pattern, enter:
 
 ```
-echo "sinbowwave" >/tmp/clockcommands
+echo "sinebow" >/tmp/clockcommands
 ```
 
-Always remember to [restart clock mode](#start) when you are done! (Or chon should do it automatically at midnight)
+Always remember to [restart clock mode](#starting-up-the-clock) when you are done. The midnight cron job also restores it if configured.
  
 
 # Replacing a digit panel
 
-All panels are identical, so can easily be swapped out with spares in case of problems. 
+Panels are assigned to clock positions through DHCP/DNS. A replacement must have the correct LEDscape configuration for its attached strings; DLD imports that target configuration rather than assuming every panel has identical LEDs or string lengths.
 
 Once a digit has been swapped, you need to update the DHCP/DNS entry for the MAC address of the new panel to map to the correct location on the clock. To do this, on the Pi command line run...
 
 `digitpicker.sh`
 
-Scroll though and find the old panel that was located in the replaced position and change the name to something like `deadH20`. Next look for an entry with a name like `beaglebone` or `*` rather than a good name. This is likely the new panel. Hit enter and the digit should blink on the clock. Next enter the correct DNS name for this position (i.e. `H20`) and press enter. Then save the file and restart the clockmode program so the changes take effect. 
+Scroll through and find the old panel at the replaced position and change its name to something like `deadH02`. Next look for an entry named `beaglebone` or `*`; this is likely the new panel. Hit enter and check which digit blinks. Enter the correct DNS name for that position, such as `H02`, then save and restart clock mode. Valid production names are `H01`–`H12` and `M00`–`M59`. If the replacement should run a DLD trial, select its position on `/deploy.html` after DNS resolves correctly; the deployment sets the matching FFS index.
 
 # Backdoor
 
@@ -233,13 +247,17 @@ There is a hidden wifi access point in the digit 57 box to give direct access to
 
 # Extending the display
 
-There are several scripts showing examples of how to update the display for modes other than clock. All use OPC over UDP to set the pixels in each digit. `ticktest.sh` is a good place to start. It lights up each digit in sequence with red, green, blue, and white. Note that you can use any RGB color. To run `ticktest`, enter...
+The existing display scripts use OPC over UDP. `ticktest.sh` lights up each digit in sequence with red, green, and blue. To run it through the controller, enter:
 
 ```
-echo "sinbowwave" >/tmp/clockcommands
+echo "ticktest" >/tmp/clockcommands
 ```
 
 For more complicated displays, C is likely faster than shell scripts. The beginnings of some C drivers are in `maptest.c`. 
+
+DLD uses the first RGB pixel in an OPC packet as the uniform color of the entire panel. Clock colors and uniform panel effects work with this shim; patterns that draw individual pixels within a panel lose that detail. DLD also accepts [Full Frame Snapshot packets](webcontrol.md#input-protocols-and-indicators): one broadcast contains an RGB color for each of the 72 panels. The existing clock scripts still send OPC; installing DLD does not convert them to FFS.
+
+`snow.sh` and the canvas work in `leds.c` are unfinished experiments, not part of the DLD installer or a supported snow control. `pipereader.sh` lists the commands the current control service accepts.
 
 # Getting a diagnostic view of the digit statuses
 
