@@ -92,7 +92,7 @@ First try reseting the whole column using the Breaker Reset procedure below. If 
 
 ## Whole clock showing slow rainbow error pattern
 
-This symptom describes LEDscape. A panel running a DLD trial instead shows a smooth red idle flash after a minute without accepted color packets; see [DLD indicators](webcontrol.md#input-protocols-and-indicators).
+This symptom describes LEDscape. A panel running a DLD trial instead shows a smooth red idle flash after more than a minute without received UDP traffic; see [DLD indicators](webcontrol.md#input-protocols-and-indicators).
 
 There was either a power failure or the controller is unplugged. 
 

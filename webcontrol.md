@@ -199,11 +199,14 @@ The OPC shim provides one color for the whole panel. It does not reproduce
 spatial images or animations within a panel from the remaining packet pixels.
 
 The web launcher uses the receiver's default indicators: one green smooth flash
-at startup and a red smooth flash after a minute without an accepted color
-packet or another idle flash. Each flash ramps up for 0.5 seconds and back down
-for 0.5 seconds. Accepted color input interrupts either flash at the next frame,
+at startup and a red smooth flash after more than 60 seconds since the latest
+received datagram or completion of the previous red flash. Each flash ramps up
+for 0.5 seconds and back down for 0.5 seconds. A completed flash leaves the panel
+black until another valid color arrives. Accepted color input interrupts either flash at the next frame,
 so the startup flash may be cut short while the clock is already streaming.
-Repeated red flashes indicate missing accepted input. The command-line digit wrapper
+Repeated red flashes indicate that the receiver is not receiving UDP traffic.
+Even malformed datagrams reset the idle timer, although they do not change the
+color or interrupt an active flash. The command-line digit wrapper
 offers `--no-startup-flash` and `--no-idle-flash`; the browser uses the defaults.
 
 ### Update or troubleshoot
