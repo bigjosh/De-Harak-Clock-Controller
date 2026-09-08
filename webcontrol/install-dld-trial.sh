@@ -13,12 +13,8 @@ if [ "$#" -eq 1 ] && [ "$1" = --help ]; then usage; exit 0; fi
 for tool in python3 ssh scp; do
     command -v "$tool" >/dev/null 2>&1 || { printf '%s is required.\n' "$tool" >&2; exit 2; }
 done
-scp_usage=$(LC_ALL=C scp -O </dev/null 2>&1 || :)
-case "$scp_usage" in
-    *'unknown option'*|*'illegal option'*|*'invalid option'*)
-        printf '%s\n' 'The Pi needs an OpenSSH scp client supporting -O. Update openssh-client before installing.' >&2
-        exit 2 ;;
-esac
+# The bundled launcher selects -O when supported. Older OpenSSH clients
+# already use the required legacy SCP protocol without that option.
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 python3 - "$1" "$script_dir/install.sh" <<'PY'

@@ -80,8 +80,9 @@ If `curl` is missing, first run
 `sudo apt-get update && sudo apt-get install -y curl ca-certificates`.
 The installer installs other missing prerequisites through `apt-get`, selects
 the Apache CGI module for its current configuration, and reloads Apache.
-An installed but older OpenSSH client without `scp -O` support produces a
-clear error; update `openssh-client` before retrying.
+Older OpenSSH clients are supported: the bundled launcher uses their default
+SCP protocol. For newer clients it selects that protocol with `scp -O` after a
+local capability check. No client upgrade is needed just to add this option.
 
 The download is a single controller snapshot over verified HTTPS. Before
 installation, the script checks the runtime archive checksum, all nested native
@@ -119,7 +120,7 @@ build/dld-trial.tar.gz
 The original DLD `v0.1.0` release predates the named-digit wrapper, FFS, and
 automatic LEDscape import. Updating only its shell script is insufficient;
 use a current bundle and its matching bootstrap. The Pi needs an OpenSSH
-client supporting `scp -O`; the installer checks that option locally.
+client; the current Linux launcher supports both old and new `scp` versions.
 
 From the controller checkout, substitute the location of that DLD directory:
 
@@ -264,6 +265,7 @@ Additional local checks (no panels or installed system files are touched):
 
 ```sh
 python3 webcontrol/tests/test_install_from_github.py
+python3 webcontrol/tests/test_install_legacy_scp.py
 python3 webcontrol/tests/test_install_web.py
 python3 webcontrol/tests/test_package_dld_runtime.py
 ```

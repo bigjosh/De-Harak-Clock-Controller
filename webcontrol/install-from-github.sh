@@ -177,11 +177,7 @@ if [ "$check" = yes ]; then
     exit 0
 fi
 
-scp_usage=$(LC_ALL=C scp -O </dev/null 2>&1 || :)
-case "$scp_usage" in
-    *'unknown option'*|*'illegal option'*|*'invalid option'*)
-        fail 'This Pi has an old scp client. Update openssh-client to a version supporting scp -O, then rerun.' ;;
-esac
+# The bundled launcher handles both old OpenSSH scp and newer scp -O clients.
 modules=$(apache2ctl -M 2>&1) || fail "Apache configuration check failed: $modules"
 case "$modules" in
     *cgi_module*|*cgid_module*) ;;
