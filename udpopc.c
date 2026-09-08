@@ -24,9 +24,9 @@
 
 #define ASPECT_RATIO (16.0/23.0)        // Width/heigh (these are the imperical measurements in mm)
 
-unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
-unsigned char g[SIZE_X][SIZE_Y];     // Buffer of RGB values
-unsigned char b[SIZE_X][SIZE_Y];     // Buffer of RGB values
+unsigned char r[PANEL_SIZE_X][PANEL_SIZE_Y];     // Buffer of RGB values
+unsigned char g[PANEL_SIZE_X][PANEL_SIZE_Y];     // Buffer of RGB values
+unsigned char b[PANEL_SIZE_X][PANEL_SIZE_Y];     // Buffer of RGB values
 
 #define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
 
@@ -45,6 +45,92 @@ void initopcheader() {
 	opcbuffer[2]=(OPC_BYTECOUNT>>8);		// len MSB
 	opcbuffer[3]=(OPC_BYTECOUNT&0xff);	// len LSB
 	
+}
+
+
+/* OPC stuff */
+
+#define PIN_COUNT 6
+
+
+#define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
+
+#define OPC_BYTECOUNT (SIZE_X*(PIN_COUNT*ROWS_PER_PIN)*3)       // 3 bytes per pixel for RGB
+
+
+#define OPC_HEADERSIZE 4 		// 4 bytes in opc header
+#define OPC_BUFFERSIZE (OPC_HEADERSIZE + OPC_BYTECOUNT)
+
+unsigned char opcbuffer[ OPC_BUFFERSIZE ];   //Convert the buffer to a single char for each R,G, & B 
+
+void initopcheader() {
+		
+	opcbuffer[0]=0x00;		// Channel=0 
+	opcbuffer[1]=0x00;		// Command=0	
+	opcbuffer[2]=(OPC_BYTECOUNT>>8);		// len MSB
+	opcbuffer[3]=(OPC_BYTECOUNT&0xff);	// len LSB
+	
+}
+
+int sockfd;
+
+void sendOPCPixels() {
+	
+	initopcheader();			// TODO: Only do this once per run
+
+    // printf("start... pins=%d, rowsperpin=%d\r\n", PIN_COUNT , ROWS_PER_PIN);
+	
+    unsigned char *m = opcbuffer+OPC_HEADERSIZE;	
+            
+    for( int pin = 0; pin <PIN_COUNT ; pin++ ) {                // OPC packet has each string snet sequentially
+        
+        for( int row=0; row < ROWS_PER_PIN ; row++ ) {
+                       
+            int y= ( pin ) + ( row * PIN_COUNT );
+
+           // printf("p,r,y=%d,%d,%d\r\n",pin,row,y);
+                                   
+            if (y>=PANEL_SIZE_Y) {      // Of the screen?
+                                
+                for( int i=0;i<PANEL_SIZE_X * 3;i++) {
+                    
+                    *(m++) = 0x00;                                        
+                    // Send zeros as padding
+                    
+                }
+                
+            } else {                
+                        
+                if (row&1) {  // Alternating rows go back and forth
+                                        
+                    int x=PANEL_SIZE_X;
+            
+                    while (x--) {
+                                        
+                        *(m++) = (r[x][y]) ;
+                        *(m++) = (g[x][y]) ;                        
+                        *(m++) = (b[x][y]) ;
+                        
+                    }
+                    
+                } else {
+                    
+                    for( int x=0; x<PANEL_SIZE_X;x++) {
+
+                        *(m++) = (r[x][y]) ;
+                        *(m++) = (g[x][y]) ;
+                        *(m++) = (b[x][y]) ;
+                     
+                    }                
+               }                
+            }
+            
+			
+        }
+    }
+	
+    int x=write( sockfd , opcbuffer ,  OPC_BUFFERSIZE );		// 3 bytes (r,g,b) per pixel	
+    
 }
 
 
@@ -97,9 +183,9 @@ void sendOPCPixels() {
 
            // printf("p,r,y=%d,%d,%d\r\n",pin,row,y);
                                    
-            if (y>=SIZE_Y) {      // Of the screen?
+            if (y>=PANEL_SIZE_Y) {      // Of the screen?
                                 
-                for( int i=0;i<SIZE_X * 3;i++) {
+                for( int i=0;i<PANEL_SIZE_X * 3;i++) {
                     
                     *(m++) = 0x00;                                        
                     // Send zeros as padding
@@ -110,7 +196,7 @@ void sendOPCPixels() {
                         
                 if (row&1) {  // Alternating rows go back and forth
                                         
-                    int x=SIZE_X;
+                    int x=PANEL_SIZE_X;
             
                     while (x--) {
                                         
@@ -122,7 +208,7 @@ void sendOPCPixels() {
                     
                 } else {
                     
-                    for( int x=0; x<SIZE_X;x++) {
+                    for( int x=0; x<PANEL_SIZE_X;x++) {
 
                         *(m++) = (r[x][y]) ;
                         *(m++) = (g[x][y]) ;
@@ -168,7 +254,7 @@ int main( int argc, char **argv) {
             fprintf(stderr,"Usage  : leds dest_ip  rgb left right top bot [col] [row]\r\n");
             fprintf(stderr,"         RGB color format XXXXXX (FFFFFF=white)\r\n");
             
-            fprintf(stderr,"Example: leds 192.168.174.2 0000FF 0 %d  0 %d  = Full panel to blue\r\n", SIZE_X , SIZE_Y );
+            fprintf(stderr,"Example: leds 192.168.174.2 0000FF 0 %d  0 %d  = Full panel to blue\r\n", PANEL_SIZE_X , PANEL_SIZE_Y );
             
             return(1);        
     }
@@ -197,14 +283,14 @@ int main( int argc, char **argv) {
 	unsigned char top 		= atoi( argv[5] );	
 	unsigned char bottom 	= atoi( argv[6] );	
 	
-	unsigned char col = SIZE_X;
+	unsigned char col = PANEL_SIZE_X;
 	
 	if (argc>7) {
 		
 		col = atoi( argv[7] );
 	}
 
-	unsigned char row = SIZE_Y;
+	unsigned char row = PANEL_SIZE_Y;
 	
 	if (argc>8) {
 		
@@ -217,12 +303,12 @@ int main( int argc, char **argv) {
 
     printf("l=%d r=%d t=%d b=%d\r\n",left,right,top,bottom);
 		
-   for( int x=left; x< MIN(SIZE_X , right)  ; x++) {
+   for( int x=left; x< MIN(PANEL_SIZE_X , right)  ; x++) {
        	   
-      if ( (col >= SIZE_X ) || ( x == col ) ) {
+      if ( (col >= PANEL_SIZE_X ) || ( x == col ) ) {
              	   	   
-        for(int y=top;y<= MIN(SIZE_Y, bottom) ;y++) {
- 	     if ( (row >= SIZE_Y ) || ( y == row ) ) {
+        for(int y=top;y<= MIN(PANEL_SIZE_Y, bottom) ;y++) {
+ 	     if ( (row >= PANEL_SIZE_Y ) || ( y == row ) ) {
                        
             	r[x][y] = r1;
             	g[x][y] = g1;

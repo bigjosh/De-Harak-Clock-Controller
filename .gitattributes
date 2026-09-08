@@ -1,6 +1,14 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Web installers and CGI entry points execute on Linux, even when edited here.
+/webcontrol/*.sh text eol=lf
+/webcontrol/usr_lib_cgi-bin/* text eol=lf
+/webcontrol/tests/*.py text eol=lf
+/webcontrol/package-dld-runtime.py text eol=lf
+/webcontrol/dld-runtime.tar.gz binary
+/webcontrol/dld-runtime.sha256 text eol=lf
+
 # Custom for Visual Studio
 *.cs     diff=csharp
 

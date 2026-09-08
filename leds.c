@@ -17,16 +17,61 @@
 
 #define PI (3.141592653589793)
 
-#define SIZE_X 59
-#define SIZE_Y 26
+/* PIXEL STUFF */
+
+struct pixel_t {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
+/* PANEL STUFF */
+
+// Pixels in each panel
+
+#define PANEL_SIZE_X 59
+#define PANEL_SIZE_Y 26
+
+struct panel_t {
+    pixel_t pixels[PANEL_SIZE_X][PANEL_SIZE_Y];
+
+    pixel_t getPixel( uint16_t x , uint16_t y ) {
+        return pixels[x][y];
+    }
+}
+
+color_t setPixelRGB( color_t pixel, uint8_t r , uint8_t g, uint8_t b) {
+    pixel.r = r;
+    pixel.g = g;
+    pixel.b = b;
+}
+
+/* CANVAS STUFF */ 
+
+#define COLS 12
+#define ROWS 6
+
+#define CANVAS_SIZE_X (COLS*PANEL_SIZE_X)
+#define CANVAS_SIZE_Y (ROWS*PANEL_SIZE_Y)
+
+struct canvas_t {
+    panel_t panels[ CANVAS_SIZE_X , CANVAS_SIZE_Y ];
+
+    pixel_t getPixel( uint16_t x, uint16_t y ) {
+
+        return panels[ x / PANEL_SIZE_X ][ y / PANEL_SIZE_Y].getPixel(  x % PANEL_SIZE_X , y % PANEL_SIZE_Y );
+
+    }
+}
+
 
 #define ASPECT_RATIO (16.0/23.0)        // Width/heigh (these are the imperical measurements in mm)
 
+
+/* OPC stuff */
+
 #define PIN_COUNT 6
 
-unsigned char r[SIZE_X][SIZE_Y];     // Buffer of RGB values
-unsigned char g[SIZE_X][SIZE_Y];     // Buffer of RGB values
-unsigned char b[SIZE_X][SIZE_Y];     // Buffer of RGB values
 
 #define ROWS_PER_PIN (((SIZE_Y-1) / PIN_COUNT)+1)
 
@@ -65,9 +110,9 @@ void sendOPCPixels() {
 
            // printf("p,r,y=%d,%d,%d\r\n",pin,row,y);
                                    
-            if (y>=SIZE_Y) {      // Of the screen?
+            if (y>=PANEL_SIZE_Y) {      // Of the screen?
                                 
-                for( int i=0;i<SIZE_X * 3;i++) {
+                for( int i=0;i<PANEL_SIZE_X * 3;i++) {
                     
                     *(m++) = 0x00;                                        
                     // Send zeros as padding
@@ -78,7 +123,7 @@ void sendOPCPixels() {
                         
                 if (row&1) {  // Alternating rows go back and forth
                                         
-                    int x=SIZE_X;
+                    int x=PANEL_SIZE_X;
             
                     while (x--) {
                                         
@@ -90,7 +135,7 @@ void sendOPCPixels() {
                     
                 } else {
                     
-                    for( int x=0; x<SIZE_X;x++) {
+                    for( int x=0; x<PANEL_SIZE_X;x++) {
 
                         *(m++) = (r[x][y]) ;
                         *(m++) = (g[x][y]) ;
@@ -178,11 +223,11 @@ void sinewaves(){
     for( int loop = 0; loop<1000;loop++) {
         
     
-        for( int x=0; x<SIZE_X; x++) {
+        for( int x=0; x<PANEL_SIZE_X; x++) {
         
-            for(int y=0;y<SIZE_Y;y++) {
+            for(int y=0;y<PANEL_SIZE_Y;y++) {
             
-                int color = (int) (0.5+ ( ( 100.0 + (100.0 * sin( (( (1.0* loop) / 1000) + ( (1.0 * x) / SIZE_X) ) * 3.1415 * 20 )  ) ) ) );
+                int color = (int) (0.5+ ( ( 100.0 + (100.0 * sin( (( (1.0* loop) / 1000) + ( (1.0 * x) / PANEL_SIZE_X) ) * 3.1415 * 20 )  ) ) ) );
             
                 SETRGB( x , y , color , color , color );
             
@@ -228,8 +273,8 @@ void bullseyes( const char *colorString ){
     
     unsigned int colorstep = 0;		// For rainbow display
               
-    float xmid = SIZE_X/2.0;
-    float ymid = SIZE_Y/2.0;
+    float xmid = PANEL_SIZE_X/2.0;
+    float ymid = PANEL_SIZE_Y/2.0;
     
     float radius = sqrt( (xmid*xmid) + (ymid*ymid));
     
@@ -303,13 +348,13 @@ void bullseyes( const char *colorString ){
 
         for( float step = 0; step < 2.0 * PI ; step += ( 2.0*PI / BE_STEPS )) {     // One full animation cycle
                 
-            for( int x=0; x<SIZE_X; x++) {
+            for( int x=0; x<PANEL_SIZE_X; x++) {
                 
                 float xd = (xmid - x ) * ASPECT_RATIO;		// Correct pitch aspect ratiox;
 
                 float xsq = xd * xd;
                             
-                for(int y=0;y<SIZE_Y;y++) {
+                for(int y=0;y<PANEL_SIZE_Y;y++) {
                     
                     float yd = ymid - y; 
                     
@@ -367,11 +412,11 @@ void squares() {
 
     for( int loop = 0; loop<1000;loop++) {
         
-        int x1 = random() % SIZE_X;
-        int y1 = random() % SIZE_Y;
+        int x1 = random() % PANEL_SIZE_X;
+        int y1 = random() % PANEL_SIZE_Y;
         
-        int x2 = random() % SIZE_X;
-        int y2 = random() % SIZE_Y;
+        int x2 = random() % PANEL_SIZE_X;
+        int y2 = random() % PANEL_SIZE_Y;
         
         int red = RANDPRICOLOR();
         int green = RANDPRICOLOR();
@@ -422,8 +467,8 @@ void stars(const char *colorString) {
         b[x][y]=0;
         
         
-        x = random() % SIZE_X;
-        y = random() % SIZE_Y;
+        x = random() % PANEL_SIZE_X;
+        y = random() % PANEL_SIZE_Y;
         
         SETRGB( x ,y ,  r1, g1 , b1 );
 
@@ -449,8 +494,8 @@ void stars(const char *colorString) {
 void plasma() {
     
     
-   float xmid = SIZE_X/2.0;
-   float ymid = SIZE_Y/2.0;
+   float xmid = PANEL_SIZE_X/2.0;
+   float ymid = PANEL_SIZE_Y/2.0;
    
 //   float radius = sqrt( (xmid*xmid) + (ymid*ymid));
 
@@ -458,9 +503,9 @@ void plasma() {
    
    while (1) {
          
-       for( int x=0; x<SIZE_X; x++) {
+       for( int x=0; x<PANEL_SIZE_X; x++) {
           
-           for(int y=0;y<SIZE_Y;y++) {
+           for(int y=0;y<PANEL_SIZE_Y;y++) {
                
              float time = loop/2.0 ;  
              
@@ -468,8 +513,8 @@ void plasma() {
 
                 
                    sin( pdist(x + time, y, xmid , ymid ) / 8.0) 
-                 + sin(pdist(x, y, SIZE_X/4 , SIZE_Y/4 ) / 8.0)
-                 + sin(pdist(x, y + time / 7, SIZE_X * 0.75, SIZE_Y * 0.25) / 7.0)
+                 + sin(pdist(x, y, PANEL_SIZE_X/4 , PANEL_SIZE_Y/4 ) / 8.0)
+                 + sin(pdist(x, y + time / 7, PANEL_SIZE_X * 0.75, PANEL_SIZE_Y * 0.25) / 7.0)
                  + sin(pdist(x, y, 40.0, 10.0) / 8.0);
                
              int color = (int) ((4 + value) * 32);
@@ -536,7 +581,7 @@ void rockrose() {
     
     while(1) {
     
-        for( int scroll=0; scroll < (RR_X - SIZE_X) ; scroll++ ) {
+        for( int scroll=0; scroll < (RR_X - PANEL_SIZE_X) ; scroll++ ) {
         
             for( unsigned char step=0; step < RR_STEPS ; step++ ) {          // Subpixel stepping
 
@@ -546,7 +591,7 @@ void rockrose() {
                
                    unsigned char currentPixel = *rrdatarow;
                
-                   for( int x=0; x< SIZE_X; x++ ) {
+                   for( int x=0; x< PANEL_SIZE_X; x++ ) {
                 
                         int color; 
                                                                                                        
@@ -588,9 +633,9 @@ void speedtest(){
     for( int loop = 0; loop<1000;loop++) {
         
         
-        for( int x=0; x<SIZE_X; x++) {
+        for( int x=0; x<PANEL_SIZE_X; x++) {
             
-            for(int y=0;y<SIZE_Y;y++) {
+            for(int y=0;y<PANEL_SIZE_Y;y++) {
                 
                 r[x][y] = 200;
                                 
@@ -610,9 +655,9 @@ void full( const char *colorString ) {
     unsigned char g1 = parsehexdigits(colorString+2);
     unsigned char b1 = parsehexdigits(colorString+4);
         
-    for( int x=0; x<SIZE_X; x++) {
+    for( int x=0; x<PANEL_SIZE_X; x++) {
             
-        for(int y=0;y<SIZE_Y;y++) {
+        for(int y=0;y<PANEL_SIZE_Y;y++) {
                 
             r[x][y] = r1;
             g[x][y] = g1;
@@ -649,10 +694,10 @@ void corners( const char *colorString ) {
     } point_t;
 
     point_t points[] = { 
-        {0,SIZE_Y-1} , 
-        {SIZE_X-1, SIZE_Y-1},
+        {0,PANEL_SIZE_Y-1} , 
+        {PANEL_SIZE_X-1, PANEL_SIZE_Y-1},
         {0,0} , 
-        {SIZE_X-1,0} ,          
+        {PANEL_SIZE_X-1,0} ,          
     };
 
 
@@ -705,11 +750,11 @@ void half( const char *colorString ) {
     unsigned char g1 = parsehexdigits(colorString+2);
     unsigned char b1 = parsehexdigits(colorString+4);
     
-    unsigned int marginx = (SIZE_X /4)+5 ;
+    unsigned int marginx = (PANEL_SIZE_X /4)+5 ;
         
-    for( int x=marginx; x< (SIZE_X-marginx) ; x++) {
+    for( int x=marginx; x< (PANEL_SIZE_X-marginx) ; x++) {
         
-        for(int y=0;y<SIZE_Y;y++) {
+        for(int y=0;y<PANEL_SIZE_Y;y++) {
             
             r[x][y] = r1;
             g[x][y] = g1;
@@ -724,24 +769,30 @@ void half( const char *colorString ) {
 }
 
 
-int opensocket() {
-	
-	int n;
-   
-    struct sockaddr_in servaddr;
- 
-    sockfd=socket(AF_INET,SOCK_STREAM,0);
-    bzero(&servaddr,sizeof servaddr);
- 
-    servaddr.sin_family=AF_INET;
-    servaddr.sin_port=htons(7890);
- 
-    inet_pton(AF_INET,"127.0.0.1",&(servaddr.sin_addr));
- 
-    connect(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+struct opc_t {
+
+
+
+    // 0==
+    int open() {
+        
+        int n;
     
-    return(sockfd);
+        struct sockaddr_in servaddr;
     
+        sockfd=socket(AF_INET,SOCK_STREAM,0);
+        bzero(&servaddr,sizeof servaddr);
+    
+        servaddr.sin_family=AF_INET;
+        servaddr.sin_port=htons(7890);
+    
+        inet_pton(AF_INET,"127.0.0.1",&(servaddr.sin_addr));
+    
+        connect(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr));
+        
+        return(sockfd);
+
+    }
 }
 
 int main( int argc, char **argv) {

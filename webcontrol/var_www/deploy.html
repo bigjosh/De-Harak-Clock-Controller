@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trial deploy DLD to a clock digit</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/deploy.css">
+</head>
+<body>
+    <main class="container deploy-page">
+        <p><a href="control.html">&larr; Back to clock controls</a></p>
+        <h1>Trial deploy new DLD to digit</h1>
+        <p>Choose a panel to start its trial deployment immediately. Only one deployment runs at a time.</p>
+        <p class="text-muted">The top row is hours; the five rows below are minutes. A trial ends when that digit reboots.</p>
+        <noscript><p class="alert alert-danger">JavaScript is needed to choose a digit and display deployment output.</p></noscript>
+        <p class="scroll-hint text-muted">Scroll the grid sideways to see all 12 columns.</p>
+        <div class="panel-grid-scroll" tabindex="0" role="region" aria-label="Clock panels: six rows and twelve columns">
+            <table class="panel-grid" id="panel-grid" aria-busy="true">
+                <caption class="sr-only">Hours H01 through H12, followed by minutes M00 through M59, from left to right.</caption>
+                <tbody id="panel-grid-body"></tbody>
+            </table>
+        </div>
+        <p id="deploy-status" class="alert alert-info" role="status" aria-live="polite" aria-atomic="true">Connecting to the deployment service&hellip;</p>
+        <section aria-labelledby="output-heading">
+            <h2 id="output-heading">Deployment output</h2>
+            <p class="text-muted">Output updates automatically. You can leave this page while a deployment runs and return to see its progress.</p>
+            <pre id="deploy-output" tabindex="0" aria-label="Deployment console output">No digit selected yet.</pre>
+            <p id="output-note" class="text-muted" hidden></p>
+        </section>
+    </main>
+    <script src="js/deploy.js"></script>
+</body>
+</html>

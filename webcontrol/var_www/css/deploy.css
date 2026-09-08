@@ -1,0 +1,15 @@
+.deploy-page { padding-top: 22px; padding-bottom: 32px; }
+.deploy-page h1 { font-size: 28px; }
+.deploy-page h2 { font-size: 21px; }
+.panel-grid-scroll { width: 100%; overflow-x: auto; margin: 20px 0; -webkit-overflow-scrolling: touch; }
+.panel-grid { width: 100%; min-width: 792px; table-layout: fixed; border-collapse: separate; border-spacing: 4px; }
+.panel-grid td { padding: 0; }
+.panel-digit { width: 100%; min-height: 50px; padding: 10px 4px; font-size: 16px; font-weight: bold; }
+.panel-digit.hour { background-color: #edf5fb; }
+.panel-digit.active { background-color: #286090; color: white; border-color: #204d74; }
+.panel-digit:disabled { opacity: .7; }
+.panel-digit:focus, .panel-grid-scroll:focus, #deploy-output:focus { outline: 3px solid #e28a00; outline-offset: 2px; }
+#deploy-status { margin-top: 12px; }
+#deploy-output { min-height: 180px; max-height: 55vh; overflow: auto; background: #17212b; color: #eef3f7; border-color: #17212b; padding: 16px; font-size: 13px; white-space: pre-wrap; overflow-wrap: break-word; word-wrap: break-word; }
+.scroll-hint { display: none; }
+@media (max-width: 820px) { .scroll-hint { display: block; } }

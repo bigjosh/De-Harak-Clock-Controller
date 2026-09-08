@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\Documents\\Arduino\\generated_examples\\B-ButtonPress"
+		},
+		{
+			"name": "rtest",
+			"path": "..\\..\\Documents\\PlatformIO\\Projects\\rtest"
+		}
+	],
+	"settings": {
+		"cSpell.enableFiletypes": [
+			"markdown"
+		],
+		"cSpell.enabled": false
+	}
+}
