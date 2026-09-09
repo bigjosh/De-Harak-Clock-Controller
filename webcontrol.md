@@ -175,6 +175,17 @@ validates it, stops the old LEDscape or DLD process, initializes the driver,
 and starts its UDP receiver. The controller's running clock/animation process
 continues to send its existing UDP packets during the handover.
 
+All six legacy RGB channel-order permutations are supported. LEDscape's setting
+names the order in memory, and its PRU transmits those bytes in reverse order;
+for example, legacy `GBR` becomes DLD profile `ws2811-hs-rbg` (RBG on the wire).
+The original LEDscape file is preserved. These compatibility profiles use the
+same DLD pulse timing; they change channel placement, not waveform durations.
+If an older bundle rejects legacy `GBR`, `GRB`, or `RBG`, rerun the current
+GitHub installer to update the complete runtime, then retry the digit. Changing
+only the importer is insufficient because the commands, kernel helper, and PRU
+firmware must all recognize the added profiles. Color-order import failures
+occur before the helper stops the digit's existing receiver.
+
 The handover remains a trial: the target's persistent LEDscape files and boot
 setup are preserved. A target reboot restores its existing boot behavior.
 The browser reports command failure and retains the console output; it does
@@ -227,6 +238,11 @@ deployments only; avoid running a separate manual deployment concurrently.
 There is no automatic whole-job timeout or retry. If an SSH connection stalls
 after connecting, inspect the saved log and the Pi's SSH processes before
 intervening; the target may already be partway through its handover.
+
+Older SSH clients may print `Could not create directory '/var/www/.ssh'` when
+running as Apache's `www-data`. That warning alone is not a deployment failure:
+the launcher uses `/dev/null` for the host-key file and can still connect. Read
+the final DLD error and exit status to identify a failed deployment.
 
 The standalone backend checks in `webcontrol/tests/test_dld_trial.py` run on
 Linux with fake deployment scripts. They do not contact the clock's panels.
